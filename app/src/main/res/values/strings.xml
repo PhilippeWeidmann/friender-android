@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Friender</string>
+    <string name="mapbox_access_token">pk.eyJ1IjoicGhpbG91dXUiLCJhIjoiY2ttdXprbmZ0MDA5djJvcHF3em52anZhNiJ9.WDyC4edH2DKfkMJM8VsXOQ</string>
 </resources>
