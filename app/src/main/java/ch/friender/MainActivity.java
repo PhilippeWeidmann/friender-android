@@ -34,41 +34,14 @@ import com.mapbox.mapboxsdk.maps.Style;
 
 import java.util.List;
 
-public class MainActivity extends FragmentActivity  {
-
-    private PermissionsManager permissionsManager;
-    private MapboxMap mapboxMap;
-    private MapView mapView;
-    protected BottomNavigationView navigationView;
+public class MainActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //navigationView = findViewById(R.id.bottom_navigation);
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .setReorderingAllowed(true)
-                    .add(R.id.nav_host_fragment, Map.class, null)
-                    .commit();
-        }
-        navigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
-
-        navigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()){
-                    case R.id.page_1:
-                        Toast.makeText(MainActivity.this,"ok",Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.page_2:
-                        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-                        NavController navController = navHostFragment.getNavController();
-                        NavigationUI.setupWithNavController(navigationView, navController);
-                        break;
-                }
-                return true;
-            }
-        });
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        NavigationUI.setupWithNavController(bottomNavigationView, navHostFragment.getNavController());
     }
 }

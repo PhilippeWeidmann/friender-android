@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/page_1"
+        android:id="@+id/map"
         android:enabled="true"
         android:icon="@drawable/explore"
         android:title="Map"/>
     <item
-        android:id="@+id/page_2"
+        android:id="@+id/friendsList"
         android:enabled="true"
         android:icon="@drawable/group"
         android:title="My Friends"/>
