@@ -1,12 +1,15 @@
 package ch.friender
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.Mapbox
@@ -22,15 +25,12 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.maps.Style.OnStyleLoaded
 
-/**
- * A simple [Fragment] subclass.
- * Use the [Map.newInstance] factory method to
- * create an instance of this fragment.
- */
+
 class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
     private var permissionsManager: PermissionsManager? = null
     private lateinit var mapboxMap: MapboxMap
     private lateinit var mapView: MapView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Mapbox.getInstance(requireActivity(), getString(R.string.mapbox_access_token))
@@ -43,6 +43,10 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
         mapView = view.findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
+        val sharedPreferences = activity?.getPreferences(Context.MODE_PRIVATE)?.getString("id","")
+
+        val idText:TextView = view.findViewById(R.id.textView)
+        idText.text = "id : "+sharedPreferences.toString()
         return view
     }
 

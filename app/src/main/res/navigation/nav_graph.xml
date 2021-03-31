@@ -9,8 +9,7 @@
         android:id="@+id/map"
         android:name="ch.friender.Map"
         android:label="fragment_map"
-        tools:layout="@layout/fragment_map" >
-    </fragment>
+        tools:layout="@layout/fragment_map" />
 
     <fragment
         android:id="@+id/friendsList"
