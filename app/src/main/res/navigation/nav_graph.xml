@@ -12,10 +12,4 @@
         tools:layout="@layout/fragment_map" >
     </fragment>
 
-    <fragment
-        android:id="@+id/friendsList"
-        android:name="ch.friender.FriendsList"
-        android:label="fragment_friends_list_list"
-        tools:layout="@layout/fragment_friends_list_list" >
-    </fragment>
 </navigation>
