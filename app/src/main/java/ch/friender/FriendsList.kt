@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import ch.friender.dummy.DummyContent
 
 /**
  * A fragment representing a list of Items.
@@ -36,7 +35,7 @@ class FriendsList : Fragment() {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter = MyItemRecyclerViewAdapter2()
+                //adapter = MyItemRecyclerViewAdapter2()
             }
         }
         return view

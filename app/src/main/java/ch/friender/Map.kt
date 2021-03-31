@@ -1,5 +1,6 @@
 package ch.friender
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,8 +29,8 @@ import com.mapbox.mapboxsdk.maps.Style.OnStyleLoaded
  */
 class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
     private var permissionsManager: PermissionsManager? = null
-    private var mapboxMap: MapboxMap? = null
-    private var mapView: MapView? = null
+    private lateinit var mapboxMap: MapboxMap
+    private lateinit var mapView: MapView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Mapbox.getInstance(requireActivity(), getString(R.string.mapbox_access_token))
@@ -46,12 +47,12 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
-        this@Map.mapboxMap = mapboxMap
+        this.mapboxMap = mapboxMap
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
             enableLocationComponent(style)
             if (mapboxMap.locationComponent.lastKnownLocation != null) {
                 val position = CameraPosition.Builder()
-                        .target(LatLng(mapboxMap.locationComponent.lastKnownLocation.getLatitude(), mapboxMap.locationComponent.lastKnownLocation.getLongitude()))
+                        .target(LatLng(mapboxMap.locationComponent.lastKnownLocation!!.latitude, mapboxMap.locationComponent.lastKnownLocation!!.longitude))
                         .zoom(14.0)
                         .tilt(20.0)
                         .build()
@@ -60,6 +61,7 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
         }
     }
 
+    @SuppressLint("MissingPermission")
     private fun enableLocationComponent(loadedMapStyle: Style) {
         // Check if permissions are enabled and if not request
         if (PermissionsManager.areLocationPermissionsGranted(requireActivity())) {
@@ -82,12 +84,12 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
             locationComponent.cameraMode = CameraMode.TRACKING_COMPASS
         } else {
             permissionsManager = PermissionsManager(this)
-            permissionsManager.requestLocationPermissions(requireActivity())
+            permissionsManager!!.requestLocationPermissions(requireActivity())
         }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
-        permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        permissionsManager?.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     override fun onExplanationNeeded(permissionsToExplain: MutableList<String?>?) {
@@ -122,7 +124,7 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
         mapView.onStop()
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         mapView.onSaveInstanceState(outState)
     }
