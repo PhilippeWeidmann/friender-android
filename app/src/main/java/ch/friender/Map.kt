@@ -67,7 +67,7 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
         if (PermissionsManager.areLocationPermissionsGranted(requireActivity())) {
 
             // Get an instance of the component
-            val locationComponent = mapboxMap.getLocationComponent()
+            val locationComponent = mapboxMap.locationComponent
 
             // Activate with options
             locationComponent.activateLocationComponent(
