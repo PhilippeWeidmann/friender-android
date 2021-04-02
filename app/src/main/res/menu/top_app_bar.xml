@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:title="ID"
+        android:id="@+id/userId"
+        android:layout_width="wrap_content"
+        app:showAsAction="ifRoom"
+        android:layout_height="wrap_content" />
+
+    <item
+        android:title="Add friend"
+        android:id="@+id/addFriend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="add friend"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_baseline_person_add_24" />
+</menu>

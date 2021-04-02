@@ -43,10 +43,7 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
         mapView = view.findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
-        val sharedPreferences = activity?.getPreferences(Context.MODE_PRIVATE)?.getString("id","")
 
-        val idText:TextView = view.findViewById(R.id.textView)
-        idText.text = "id : "+sharedPreferences.toString()
         return view
     }
 
