@@ -3,6 +3,7 @@ package ch.friender
 
 import android.os.Bundle
 import android.util.Log
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
@@ -10,6 +11,7 @@ import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import im.delight.android.location.SimpleLocation
 
 class MainActivity : FragmentActivity() {
@@ -50,7 +52,7 @@ class MainActivity : FragmentActivity() {
             Log.d("here", "here1")
             SimpleLocation.openSettings(this);
         }
-        location!!.setListener {
+        location?.setListener {
             if (lat != location!!.latitude) {
                 lat = location!!.latitude
                 Log.d("new lat", "" + location!!.latitude)
@@ -64,22 +66,23 @@ class MainActivity : FragmentActivity() {
     }
 
     override fun onResume() {
-        Log.d("here", "here3")
         location?.beginUpdates()
-        lat = location!!.latitude
-        long = location!!.longitude
+        location?.let { location ->
+            lat = location.latitude
+            long = location.longitude
+        }
         super.onResume()
 
     }
 
     override fun onPause() {
-        Log.d("here", "here4")
-        location!!.endUpdates()
-        lat = location!!.latitude
-        long = location!!.longitude
+        location?.endUpdates()
+        location?.let { location ->
+            lat = location.latitude
+            long = location.longitude
+        }
         super.onPause()
 
     }
-
-
+    
 }
