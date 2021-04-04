@@ -52,9 +52,16 @@ class MainActivity : FragmentActivity() {
             SimpleLocation.openSettings(this);
         }
         location!!.setListener {
+            if (lat!=location!!.latitude){
                 lat = location!!.latitude
+                Log.d("new lat",""+location!!.latitude)
+
+            }
+            else if(long!=location!!.longitude){
                 long = location!!.longitude
-                Log.d("new location",""+ location!!.longitude+" "+location!!.latitude)
+                Log.d("new long",""+ location!!.longitude)
+            }
+
         }
     }
 
