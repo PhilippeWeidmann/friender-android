@@ -34,10 +34,10 @@ class FriendsList : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_friends_list_list, container, false)
-        val topAppBar:MaterialToolbar = view.findViewById(R.id.topAppBar)
-        val userId = activity?.getPreferences(Context.MODE_PRIVATE)?.getString("id","")
-        val idText:TextView = view.findViewById(R.id.userId)
-        idText.setText("Your ID : "+userId)
+        val topAppBar: MaterialToolbar = view.findViewById(R.id.topAppBar)
+        val userId = activity?.getPreferences(Context.MODE_PRIVATE)?.getString("id", "")
+        val idText: TextView = view.findViewById(R.id.userId)
+        idText.setText("Your ID : " + userId)
 
         topAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
@@ -62,13 +62,13 @@ class FriendsList : Fragment() {
         return view
     }
 
-    private fun addFriendDialog(){
+    private fun addFriendDialog() {
         MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Enter your friend's ID")
-                .setNeutralButton("CANCEL"){dialog, which ->
+                .setNeutralButton("CANCEL") { dialog, which ->
 
                 }
-                .setPositiveButton("ADD"){dialog,which ->
+                .setPositiveButton("ADD") { dialog, which ->
 
                 }
                 .show()

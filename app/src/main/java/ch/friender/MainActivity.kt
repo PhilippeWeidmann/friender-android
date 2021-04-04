@@ -15,8 +15,8 @@ import im.delight.android.location.SimpleLocation
 class MainActivity : FragmentActivity() {
 
     private var location: SimpleLocation? = null
-    var lat:Double = 0.0
-    var long:Double = 0.0
+    var lat: Double = 0.0
+    var long: Double = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +30,7 @@ class MainActivity : FragmentActivity() {
         val editor = sharedPreferences.edit()
         val url = "http://10.0.2.2:1337/user/register"
         val requestQueue = Volley.newRequestQueue(this)
-        if(sharedPreferences.getString("id", "")?.isEmpty() == true){
+        if (sharedPreferences.getString("id", "")?.isEmpty() == true) {
             val getId = JsonObjectRequest(Request.Method.POST, url, null, { res ->
                 val id = res.get("data").toString()
                 Log.d("ID", id)
@@ -40,41 +40,40 @@ class MainActivity : FragmentActivity() {
                 Log.e("error on getting id", error.toString())
             })
             requestQueue.add(getId)
-        }
-        else{
+        } else {
             Log.d("already an id", "" + sharedPreferences.getString("id", ""))
         }
 
         //get location
-         location =  SimpleLocation(this, true,false,1000,true);
+        location = SimpleLocation(this, true, false, 1000, true);
         if (!location!!.hasLocationEnabled()) {
-            Log.d("here","here1")
+            Log.d("here", "here1")
             SimpleLocation.openSettings(this);
         }
         location!!.setListener {
-            if (lat!=location!!.latitude){
+            if (lat != location!!.latitude) {
                 lat = location!!.latitude
-                Log.d("new lat",""+location!!.latitude)
+                Log.d("new lat", "" + location!!.latitude)
 
-            }
-            else if(long!=location!!.longitude){
+            } else if (long != location!!.longitude) {
                 long = location!!.longitude
-                Log.d("new long",""+ location!!.longitude)
+                Log.d("new long", "" + location!!.longitude)
             }
 
         }
     }
 
-    override fun onResume(){
-        Log.d("here","here3")
+    override fun onResume() {
+        Log.d("here", "here3")
         location?.beginUpdates()
         lat = location!!.latitude
         long = location!!.longitude
         super.onResume()
 
     }
+
     override fun onPause() {
-        Log.d("here","here4")
+        Log.d("here", "here4")
         location!!.endUpdates()
         lat = location!!.latitude
         long = location!!.longitude
