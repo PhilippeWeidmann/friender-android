@@ -1,6 +1,7 @@
 package ch.friender.persistence
 
 import android.content.Context
+import android.util.Log
 import im.delight.android.location.SimpleLocation
 
 object LocationManager {
@@ -16,6 +17,7 @@ object LocationManager {
             SimpleLocation.openSettings(context);
         }
         locationManager!!.setListener {
+            Log.d("--------",""+ currentLatitude+" "+ currentLongitude)
             currentLatitude = locationManager!!.latitude
             currentLongitude = locationManager!!.longitude
         }

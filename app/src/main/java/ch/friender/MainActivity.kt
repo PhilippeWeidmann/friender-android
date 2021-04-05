@@ -2,9 +2,13 @@ package ch.friender
 
 
 import android.Manifest
+import android.app.Notification
+import android.app.PendingIntent
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.findNavController
@@ -19,6 +23,7 @@ class MainActivity : FragmentActivity() {
 
 
     private lateinit var intentLocation:Intent
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -50,16 +55,20 @@ class MainActivity : FragmentActivity() {
         }
         intentLocation = Intent(this, LocationService::class.java)
         startService(intentLocation)
-
     }
     override fun onResume() {
-        LocationManager.startUpdatingLocation()
+        //LocationManager.startUpdatingLocation()
         super.onResume()
     }
 
     override fun onPause() {
-        LocationManager.stopUpdatingLocation()
+        //LocationManager.stopUpdatingLocation()
         super.onPause()
+    }
+
+    override fun onDestroy() {
+        stopService(intentLocation)
+        super.onDestroy()
     }
 
 
