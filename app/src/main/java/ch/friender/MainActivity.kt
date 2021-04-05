@@ -2,8 +2,6 @@ package ch.friender
 
 
 import android.Manifest
-import android.app.Notification
-import android.app.PendingIntent
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -20,7 +18,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
 class MainActivity : FragmentActivity() {
-
 
     private lateinit var intentLocation:Intent
     @RequiresApi(Build.VERSION_CODES.O)
@@ -40,7 +37,6 @@ class MainActivity : FragmentActivity() {
         val editor = sharedPreferences.edit()
         if (sharedPreferences.getInt("id", -1) == -1) {
             ApiFetcher.registerUser { userId, error ->
-
                 userId?.let {
                     editor.putInt("id", it)
                     editor.apply()
@@ -57,12 +53,12 @@ class MainActivity : FragmentActivity() {
         startService(intentLocation)
     }
     override fun onResume() {
-        //LocationManager.startUpdatingLocation()
+        LocationManager.startUpdatingLocation()
         super.onResume()
     }
 
     override fun onPause() {
-        //LocationManager.stopUpdatingLocation()
+        LocationManager.stopUpdatingLocation()
         super.onPause()
     }
 

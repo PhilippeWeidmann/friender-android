@@ -6,11 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getDrawable
-import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.mapbox.android.core.permissions.PermissionsListener
@@ -38,6 +35,8 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
     private lateinit var mapboxMap: MapboxMap
     private lateinit var mapView: MapView
     private val ICON_MARKER:String = "basic-marker"
+    private var firstInit:Boolean = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Mapbox.getInstance(requireActivity(), getString(R.string.mapbox_access_token))
@@ -50,7 +49,6 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
         mapView = view.findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
-
         var bottomSheet = view.findViewById<ConstraintLayout>(R.id.bottom_sheet)
         var bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
@@ -64,13 +62,14 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
             enableLocationComponent(style)
             mapboxMap.getStyle(this::addMarkerImageToStyle)
-            if (mapboxMap.locationComponent.lastKnownLocation != null) {
+            if (mapboxMap.locationComponent.lastKnownLocation != null && firstInit) {
                 val position = CameraPosition.Builder()
                         .target(LatLng(mapboxMap.locationComponent.lastKnownLocation!!.latitude, mapboxMap.locationComponent.lastKnownLocation!!.longitude))
                         .zoom(14.0)
                         .tilt(20.0)
                         .build()
                 mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position), 2000)
+                firstInit=false
             }
 
             addMarkerImageToStyle(style)

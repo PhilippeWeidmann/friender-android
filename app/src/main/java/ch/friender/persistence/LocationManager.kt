@@ -17,7 +17,6 @@ object LocationManager {
             SimpleLocation.openSettings(context);
         }
         locationManager!!.setListener {
-            Log.d("--------",""+ currentLatitude+" "+ currentLongitude)
             currentLatitude = locationManager!!.latitude
             currentLongitude = locationManager!!.longitude
         }

@@ -23,27 +23,24 @@ open class LocationService:Service() {
         val pendingIntent = PendingIntent.getActivity(this,
                 0, notificationIntent, 0)
         val notification: Notification = Notification.Builder(this, CHANNEL_ID)
-                .setContentTitle("Foreground Service")
-                .setContentText("test")
-                .setSmallIcon(R.drawable.mapbox_compass_icon)
+                .setContentTitle("Using your GPS...")
+                .setSmallIcon(R.drawable.explore)
                 .setContentIntent(pendingIntent)
                 .build()
         startForeground(1, notification)
         return START_STICKY
     }
 
-    override fun onCreate() {
-        super.onCreate()
-    }
     override fun onBind(intent: Intent):IBinder? {
         return null
     }
+
     private  fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val serviceChannel = NotificationChannel(
                     CHANNEL_ID,
                     "Foreground Service Channel",
-                    NotificationManager.IMPORTANCE_DEFAULT
+                    NotificationManager.IMPORTANCE_LOW
             )
             val manager = getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(serviceChannel)
