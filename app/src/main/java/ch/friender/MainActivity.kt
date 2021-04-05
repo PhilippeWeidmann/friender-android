@@ -2,6 +2,7 @@ package ch.friender
 
 
 import android.Manifest
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.core.app.ActivityCompat
@@ -10,12 +11,14 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import ch.friender.networking.ApiFetcher
 import ch.friender.persistence.LocationManager
+import ch.friender.service.LocationService
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
 class MainActivity : FragmentActivity() {
 
 
+    private lateinit var intentLocation:Intent
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -45,8 +48,10 @@ class MainActivity : FragmentActivity() {
         } else {
             Log.d("already an id", "" + sharedPreferences.getInt("id", -1))
         }
-    }
+        intentLocation = Intent(this, LocationService::class.java)
+        startService(intentLocation)
 
+    }
     override fun onResume() {
         LocationManager.startUpdatingLocation()
         super.onResume()
@@ -56,5 +61,7 @@ class MainActivity : FragmentActivity() {
         LocationManager.stopUpdatingLocation()
         super.onPause()
     }
+
+
 
 }
