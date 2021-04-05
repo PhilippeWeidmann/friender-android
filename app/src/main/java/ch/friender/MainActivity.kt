@@ -1,20 +1,17 @@
 package ch.friender
 
 
+import android.Manifest
 import android.os.Bundle
 import android.util.Log
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import ch.friender.networking.ApiFetcher
 import ch.friender.persistence.LocationManager
-import com.android.volley.Request
-import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.Volley
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import im.delight.android.location.SimpleLocation
+
 
 class MainActivity : FragmentActivity() {
 
@@ -22,7 +19,8 @@ class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        //foreground permission
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1234)
         ApiFetcher.initWithContext(this)
         LocationManager.initWithContext(this)
 
