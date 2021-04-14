@@ -78,10 +78,10 @@ class ScannedBarcodeActivity : AppCompatActivity() {
                 val barcodes: SparseArray<Barcode?> = detections.detectedItems
                 if (barcodes.size() != 0) {
                     txtBarcodeValue!!.post {
-                            txtBarcodeValue!!.removeCallbacks(null)
-                            intentData = barcodes.valueAt(0)!!.rawValue
-                            txtBarcodeValue!!.text = intentData
-                            btnAction!!.text = "ADD FRIEND"
+                        txtBarcodeValue!!.removeCallbacks(null)
+                        intentData = barcodes.valueAt(0)!!.rawValue
+                        txtBarcodeValue!!.text = intentData
+                        btnAction!!.text = "ADD FRIEND"
                     }
                 }
             }

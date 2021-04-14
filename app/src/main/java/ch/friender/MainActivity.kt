@@ -11,6 +11,7 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
+import ch.friender.cryptography.CryptoManager
 import ch.friender.networking.ApiFetcher
 import ch.friender.persistence.LocationManager
 import ch.friender.service.LocationService
@@ -19,7 +20,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : FragmentActivity() {
 
-    private lateinit var intentLocation:Intent
+    private lateinit var intentLocation: Intent
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,7 +53,11 @@ class MainActivity : FragmentActivity() {
         }
         intentLocation = Intent(this, LocationService::class.java)
         startService(intentLocation)
+
+        //crypto
+        Log.i("public key", CryptoManager.generateKeyPair().publicKey.asHexString + "\n" + CryptoManager.generateKeyPair().secretKey.asHexString)
     }
+
     override fun onResume() {
         LocationManager.startUpdatingLocation()
         super.onResume()
@@ -66,7 +72,6 @@ class MainActivity : FragmentActivity() {
         stopService(intentLocation)
         super.onDestroy()
     }
-
 
 
 }

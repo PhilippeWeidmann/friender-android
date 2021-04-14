@@ -82,7 +82,7 @@ class FriendsList : Fragment() {
                 .show()
     }
 
-    private fun showQRDialog(id: String){
+    private fun showQRDialog(id: String) {
 
         val width: Int = Resources.getSystem().displayMetrics.widthPixels
         val height: Int = Resources.getSystem().displayMetrics.heightPixels
