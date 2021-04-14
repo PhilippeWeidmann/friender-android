@@ -1,8 +1,9 @@
 package ch.friender
 
-import android.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
@@ -45,7 +46,7 @@ class FriendsList : Fragment() {
         topAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.addFriend -> {
-                    addFriendDialog()
+                    startActivity(Intent(requireContext(), ScannedBarcodeActivity::class.java))
                     true
                 }
                 R.id.userId -> {
