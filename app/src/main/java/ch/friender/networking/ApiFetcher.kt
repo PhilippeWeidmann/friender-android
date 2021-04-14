@@ -18,10 +18,10 @@ object ApiFetcher {
         requestQueue = Volley.newRequestQueue(context)
     }
 
-    fun registerUser(completion: (Int?, VolleyError?) -> Unit) {
+    fun registerUser(completion: (String?, VolleyError?) -> Unit) {
         val registerUrl = baseUrl + "user/register"
         val request = JsonObjectRequest(Request.Method.POST, registerUrl, null, { res ->
-            completion(res.getJSONObject("data").getInt("id"), null)
+            completion(res.getJSONObject("data").getString("id"), null)
         }, { error ->
             completion(null, error)
         })

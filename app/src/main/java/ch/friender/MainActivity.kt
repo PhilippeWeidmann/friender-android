@@ -35,10 +35,10 @@ class MainActivity : FragmentActivity() {
 
         val sharedPreferences = getPreferences(MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        if (sharedPreferences.getInt("id", -1) == -1) {
+        if (sharedPreferences.getString("id", "") == "") {
             ApiFetcher.registerUser { userId, error ->
                 userId?.let {
-                    editor.putInt("id", it)
+                    editor.putString("id", it)
                     editor.apply()
                 }
 
@@ -47,7 +47,7 @@ class MainActivity : FragmentActivity() {
                 }
             }
         } else {
-            Log.d("already an id", "" + sharedPreferences.getInt("id", -1))
+            Log.d("already an id", "" + sharedPreferences.getString("id", ""))
         }
         intentLocation = Intent(this, LocationService::class.java)
         startService(intentLocation)
