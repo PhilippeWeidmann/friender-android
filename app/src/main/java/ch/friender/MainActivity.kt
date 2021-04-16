@@ -19,7 +19,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : FragmentActivity() {
 
-    private lateinit var intentLocation:Intent
+    private lateinit var intentLocation: Intent
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +53,7 @@ class MainActivity : FragmentActivity() {
         intentLocation = Intent(this, LocationService::class.java)
         startService(intentLocation)
     }
+
     override fun onResume() {
         LocationManager.startUpdatingLocation()
         super.onResume()
@@ -66,7 +68,6 @@ class MainActivity : FragmentActivity() {
         stopService(intentLocation)
         super.onDestroy()
     }
-
 
 
 }

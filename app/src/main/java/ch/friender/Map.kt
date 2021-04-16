@@ -34,8 +34,8 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
     private var permissionsManager: PermissionsManager? = null
     private lateinit var mapboxMap: MapboxMap
     private lateinit var mapView: MapView
-    private val ICON_MARKER:String = "basic-marker"
-    private var firstInit:Boolean = true
+    private val ICON_MARKER: String = "basic-marker"
+    private var firstInit: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,7 +69,7 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
                         .tilt(20.0)
                         .build()
                 mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position), 2000)
-                firstInit=false
+                firstInit = false
             }
 
             addMarkerImageToStyle(style)
@@ -83,9 +83,9 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
             symbolManager.addClickListener {
                 val bottomSheet = requireView().findViewById<ConstraintLayout>(R.id.bottom_sheet)
                 val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
-                if(bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED){
+                if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                     collapseSheet()
-                }else{
+                } else {
                     expandSheet()
                 }
                 true
@@ -98,20 +98,22 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
             mapboxMap.addOnMapClickListener {
                 val bottomSheet = requireView().findViewById<ConstraintLayout>(R.id.bottom_sheet)
                 val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
-                if(bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED){
+                if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                     collapseSheet()
-                }else{
+                } else {
                     expandSheet()
                 }
                 true
             }
         }
     }
+
     private fun addMarkerImageToStyle(style: Style) {
         style.addImage(ICON_MARKER,
-                BitmapUtils.getBitmapFromDrawable(ContextCompat.getDrawable(requireContext(),R.drawable.mapbox_marker_icon_20px_blue))!!,
+                BitmapUtils.getBitmapFromDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.mapbox_marker_icon_20px_blue))!!,
                 false)
     }
+
     @SuppressLint("MissingPermission")
     private fun enableLocationComponent(loadedMapStyle: Style) {
         // Check if permissions are enabled and if not request
@@ -195,13 +197,15 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
             return Map()
         }
     }
-    private fun expandSheet(){
+
+    private fun expandSheet() {
         var bottomSheet = requireView().findViewById<ConstraintLayout>(R.id.bottom_sheet)
         var bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
 
     }
-    private fun collapseSheet(){
+
+    private fun collapseSheet() {
         var bottomSheet = requireView().findViewById<ConstraintLayout>(R.id.bottom_sheet)
         var bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
