@@ -74,4 +74,8 @@ dependencies {
     implementation 'com.google.zxing:core:3.3.2'
 
     implementation 'com.google.android.gms:play-services-vision:20.1.3'
+    
+    // Lazysodium
+    implementation "com.goterl:lazysodium-android:5.0.2@aar"
+    implementation "net.java.dev.jna:jna:5.8.0@aar"
 }

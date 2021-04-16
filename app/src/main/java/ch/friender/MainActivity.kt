@@ -11,6 +11,7 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
+import ch.friender.cryptography.CryptoManager
 import ch.friender.networking.ApiFetcher
 import ch.friender.persistence.LocationManager
 import ch.friender.service.LocationService
@@ -52,6 +53,9 @@ class MainActivity : FragmentActivity() {
         }
         intentLocation = Intent(this, LocationService::class.java)
         startService(intentLocation)
+
+        //crypto
+        Log.i("public key", CryptoManager.generateKeyPair().publicKey.asHexString + "\n" + CryptoManager.generateKeyPair().secretKey.asHexString)
     }
 
     override fun onResume() {
