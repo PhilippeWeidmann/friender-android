@@ -16,6 +16,7 @@ import ch.friender.networking.ApiFetcher
 import ch.friender.persistence.LocationManager
 import ch.friender.service.LocationService
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import org.json.JSONObject
 
 
 class MainActivity : FragmentActivity() {
@@ -55,7 +56,7 @@ class MainActivity : FragmentActivity() {
         startService(intentLocation)
 
         //crypto
-        Log.i("public key", CryptoManager.generateKeyPair().publicKey.asHexString + "\n" + CryptoManager.generateKeyPair().secretKey.asHexString)
+        Log.i("public key", CryptoManager.generateKeyPair(this).publicKey.asHexString + "\n" + CryptoManager.generateKeyPair(this).secretKey.asHexString)
     }
 
     override fun onResume() {
