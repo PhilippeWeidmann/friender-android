@@ -29,6 +29,8 @@ object CryptoManager {
         editor.putString("keyPair", keyPairJSON.toString())
         editor.apply()
 
+        Log.i("crypto keys manager ", "" + sharedPreferences.getString("keyPair", "no keys"))
+
         return keyPair
     }
 

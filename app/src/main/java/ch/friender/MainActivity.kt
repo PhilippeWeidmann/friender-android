@@ -56,7 +56,19 @@ class MainActivity : FragmentActivity() {
         startService(intentLocation)
 
         //crypto
-        Log.i("public key", CryptoManager.generateKeyPair(this).publicKey.asHexString + "\n" + CryptoManager.generateKeyPair(this).secretKey.asHexString)
+        val sharedPreferencesCrypto = getSharedPreferences("keys", MODE_PRIVATE)
+        CryptoManager.generateKeyPair(this)
+        //var keys = JSONObject(sharedPreferencesCrypto.getString("keyPair", "no keys"))
+        var keys = JSONObject("{\"secretKey\":\"\",\"publicKey\":\"\"}")
+
+        if (sharedPreferencesCrypto.getString("keyPair", "no keys") == "no keys") {
+            //a surement besoin d'être refait ?
+            Log.e("no keys", "no keys were found")
+        } else {
+            keys = JSONObject(sharedPreferencesCrypto.getString("keyPair", "no keys"))
+        }
+
+        Log.i("crypto keys", " \npublic key: " + keys.get("publicKey") + "\nsecret key: " + keys.get("secretKey"))
     }
 
     override fun onResume() {
