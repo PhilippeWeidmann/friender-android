@@ -22,9 +22,9 @@ object CryptoManager {
         val sharedPreferences = context.getSharedPreferences("keys", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
 
-        val keyPairJSON= JSONObject()
-        keyPairJSON.put("secretKey",keyPair.secretKey.asHexString)
-        keyPairJSON.put("publicKey",keyPair.publicKey.asHexString)
+        val keyPairJSON = JSONObject()
+        keyPairJSON.put("secretKey", keyPair.secretKey.asHexString)
+        keyPairJSON.put("publicKey", keyPair.publicKey.asHexString)
 
         editor.putString("keyPair", keyPairJSON.toString())
         editor.apply()
@@ -34,7 +34,7 @@ object CryptoManager {
         return keyPair
     }
 
-    fun destroyKeyPair(context: Context){
+    fun destroyKeyPair(context: Context) {
         val sharedPreferences = context.getSharedPreferences("keys", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.remove("keys")
