@@ -17,7 +17,6 @@ class FriendsList : Fragment() {
 
     private var columnCount = 1
     private val ARG_COLUMN_COUNT = "column-count"
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {

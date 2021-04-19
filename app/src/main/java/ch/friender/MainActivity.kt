@@ -22,11 +22,13 @@ import org.json.JSONObject
 class MainActivity : FragmentActivity() {
 
     private lateinit var intentLocation: Intent
+    var firstLaunch = false
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        firstLaunch=true
         //foreground permission
         ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1234)
         ApiFetcher.initWithContext(this)
@@ -55,20 +57,7 @@ class MainActivity : FragmentActivity() {
         intentLocation = Intent(this, LocationService::class.java)
         startService(intentLocation)
 
-        //crypto
-        val sharedPreferencesCrypto = getSharedPreferences("keys", MODE_PRIVATE)
-        CryptoManager.generateKeyPair(this)
-        //var keys = JSONObject(sharedPreferencesCrypto.getString("keyPair", "no keys"))
-        var keys = JSONObject("{\"secretKey\":\"\",\"publicKey\":\"\"}")
 
-        if (sharedPreferencesCrypto.getString("keyPair", "no keys") == "no keys") {
-            //a surement besoin d'être refait ?
-            Log.e("no keys", "no keys were found")
-        } else {
-            keys = JSONObject(sharedPreferencesCrypto.getString("keyPair", "no keys"))
-        }
-
-        Log.i("crypto keys", " \npublic key: " + keys.get("publicKey") + "\nsecret key: " + keys.get("secretKey"))
     }
 
     override fun onResume() {

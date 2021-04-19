@@ -14,13 +14,30 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
+import androidx.fragment.app.FragmentActivity
+import ch.friender.cryptography.CryptoManager
 import com.google.zxing.WriterException
+import org.json.JSONObject
 
 class AddFriend : Fragment() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //crypto
+        val sharedPreferencesCrypto = requireActivity().getSharedPreferences("keys", FragmentActivity.MODE_PRIVATE)
+        CryptoManager.generateKeyPair(requireContext())
+        //var keys = JSONObject(sharedPreferencesCrypto.getString("keyPair", "no keys"))
+        var keys = JSONObject("{\"secretKey\":\"\",\"publicKey\":\"\"}")
+
+        if (sharedPreferencesCrypto.getString("keyPair", "no keys") == "no keys") {
+            //a surement besoin d'être refait ?
+            Log.e("no keys", "no keys were found")
+        } else {
+            keys = JSONObject(sharedPreferencesCrypto.getString("keyPair", "no keys"))
+        }
+
+        Log.i("crypto keys", " \npublic key: " + keys.get("publicKey") + "\nsecret key: " + keys.get("secretKey"))
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -48,6 +65,11 @@ class AddFriend : Fragment() {
             startActivity(intent)
         }
         return view
+    }
+
+    override fun onDestroy() {
+        CryptoManager.destroyKeyPair(requireContext())
+        super.onDestroy()
     }
 
 }

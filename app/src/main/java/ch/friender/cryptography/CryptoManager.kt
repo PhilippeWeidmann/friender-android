@@ -34,6 +34,14 @@ object CryptoManager {
         return keyPair
     }
 
+    fun destroyKeyPair(context: Context){
+        val sharedPreferences = context.getSharedPreferences("keys", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.remove("keys")
+        editor.apply()
+        Log.i("crypto keys manager ", "destroyed keys")
+    }
+
     fun encrypt(message: String, friendPublicKey: Key): String {
         return boxLazy.cryptoBoxSealEasy(message, friendPublicKey)
     }

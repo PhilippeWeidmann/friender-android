@@ -2,9 +2,11 @@ package ch.friender
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -12,6 +14,8 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
+import com.mapbox.geojson.Feature
+import com.mapbox.geojson.FeatureCollection
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
@@ -27,7 +31,10 @@ import com.mapbox.mapboxsdk.maps.Style.OnStyleLoaded
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.BitmapUtils
+import org.json.JSONArray
+import org.json.JSONObject
 
 
 class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
@@ -35,7 +42,6 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
     private lateinit var mapboxMap: MapboxMap
     private lateinit var mapView: MapView
     private val ICON_MARKER: String = "basic-marker"
-    private var firstInit: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,8 +55,8 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
         mapView = view.findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync(this)
-        var bottomSheet = view.findViewById<ConstraintLayout>(R.id.bottom_sheet)
-        var bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+        val bottomSheet = view.findViewById<ConstraintLayout>(R.id.bottom_sheet)
+        val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
 
 
@@ -62,30 +68,46 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
             enableLocationComponent(style)
             mapboxMap.getStyle(this::addMarkerImageToStyle)
-            if (mapboxMap.locationComponent.lastKnownLocation != null && firstInit) {
+            if (mapboxMap.locationComponent.lastKnownLocation != null) {
                 val position = CameraPosition.Builder()
                         .target(LatLng(mapboxMap.locationComponent.lastKnownLocation!!.latitude, mapboxMap.locationComponent.lastKnownLocation!!.longitude))
                         .zoom(14.0)
-                        .tilt(20.0)
+                        .tilt(0.0)
                         .build()
-                mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position), 2000)
-                firstInit = false
+                if ((activity as? MainActivity)?.firstLaunch == true) {
+                    mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position), 2000)
+                    (activity as? MainActivity)?.firstLaunch = false
+                } else {
+                    mapboxMap.cameraPosition = position
+                }
             }
 
+            //add marker image to style
             addMarkerImageToStyle(style)
             // create symbol manager object
             val symbolManager = SymbolManager(mapView, mapboxMap, style)
-            val symbol = symbolManager.create(SymbolOptions()
-                    .withLatLng(LatLng(46.2, 6.1667))
-                    .withIconImage(ICON_MARKER)
-                    .withIconSize(1.0f))
-            // add click listeners if desired
+            //test data
+            val testArray = JSONArray()
+            testArray.put(JSONObject("""{"lat":46.2,"long":6.1670,"name1":"John","name2":"Doe"}"""))
+            testArray.put(JSONObject("""{"lat":46.201,"long":6.1680,"name1":"Jesse","name2":"Doe"}"""))
+            testArray.put(JSONObject("""{"lat":46.2,"long":6.1690,"name1":"Jane","name2":"Doe"}"""))
+            for (i in 0 until testArray.length()) {
+                Log.d("test", testArray.getJSONObject(i).toString())
+                val latLoop = testArray.getJSONObject(i).get("lat")
+                val longLoop = testArray.getJSONObject(i).get("long")
+                val symbol = symbolManager.create(SymbolOptions()
+                        .withLatLng(LatLng(latLoop as Double, longLoop as Double))
+                        .withIconImage(ICON_MARKER)
+                        .withIconSize(1.0f))
+            }
+            // add click listeners
             symbolManager.addClickListener {
+                Log.d("test", it.id.toString())
                 val bottomSheet = requireView().findViewById<ConstraintLayout>(R.id.bottom_sheet)
+                bottomSheet.findViewById<TextView>(R.id.name).text = testArray.getJSONObject(it.id.toInt()).get("name1").toString()
+                bottomSheet.findViewById<TextView>(R.id.surname).text = testArray.getJSONObject(it.id.toInt()).get("name2").toString()
                 val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
-                if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
-                    collapseSheet()
-                } else {
+                if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
                     expandSheet()
                 }
                 true
@@ -100,8 +122,6 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
                 val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
                 if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                     collapseSheet()
-                } else {
-                    expandSheet()
                 }
                 true
             }
