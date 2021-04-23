@@ -22,6 +22,12 @@ class QRScanner : Fragment() {
     private lateinit var barcodeDetector: BarcodeDetector
     private var cameraSource: CameraSource? = null
     var intentData = ""
+    private var keys = ""
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        keys = arguments?.get("keys").toString()
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.activity_scanned_barcode, container, false)
@@ -68,7 +74,7 @@ class QRScanner : Fragment() {
                     txtBarcodeValue!!.post {
                         txtBarcodeValue!!.removeCallbacks(null)
                         intentData = barcodes.valueAt(0)!!.rawValue
-                        val action = QRScannerDirections.actionQRScannerToFriendsList(intentData, true)
+                        val action = QRScannerDirections.actionQRScannerToAddFriend2(intentData, true)
                         view?.findNavController()?.navigate(action)
                     }
                 }

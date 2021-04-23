@@ -16,26 +16,43 @@ import androidmads.library.qrgenearator.QRGEncoder
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.findNavController
 import ch.friender.cryptography.CryptoManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.WriterException
 import org.json.JSONObject
 
 class AddFriend : Fragment() {
 
+    private lateinit var keys:JSONObject
+    private var QRData = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //crypto
         val sharedPreferencesCrypto = requireActivity().getSharedPreferences("keys", FragmentActivity.MODE_PRIVATE)
         CryptoManager.generateKeyPair(requireContext())
-        var keys = JSONObject("{\"secretKey\":\"\",\"publicKey\":\"\"}")
-
+        keys = JSONObject("{\"secretKey\":\"\",\"publicKey\":\"\"}")
         if (sharedPreferencesCrypto.getString("keyPair", "no keys") == "no keys") {
             //a surement besoin d'être refait ?
             Log.e("no keys", "no keys were found")
         } else {
             keys = JSONObject(sharedPreferencesCrypto.getString("keyPair", "no keys"))
         }
-
+        if (arguments?.getBoolean("comesFromQR") == true) {
+            if (QRData != "") {
+                Log.d("QRDATA", "" + QRData)
+                if (correctQR(QRData)) {
+                    addFriend(QRData)
+                } else {
+                    MaterialAlertDialogBuilder(requireContext())
+                            .setTitle("Could not add friend")
+                            .setMessage("The QR scanned was not a correct Friender QR, please try again")
+                            .setPositiveButton("OK") { dialog, _ ->
+                                dialog.dismiss()
+                            }
+                            .show()
+                }
+            }
+        }
         Log.i("crypto keys", " \npublic key: " + keys.get("publicKey") + "\nsecret key: " + keys.get("secretKey"))
     }
 
@@ -50,7 +67,10 @@ class AddFriend : Fragment() {
         val image = view.findViewById<ImageView>(R.id.QR_image)
         val id = activity?.getPreferences(Context.MODE_PRIVATE)?.getString("id", "")
         view.findViewById<TextView>(R.id.id_textview).text = id
-        val qrgEncoder = QRGEncoder(id, null, QRGContents.Type.TEXT, smallerDimension)
+        val userQRData = JSONObject()
+        userQRData.put("id",id)
+        userQRData.put("publicKey",keys.get("publicKey"))
+        val qrgEncoder = QRGEncoder(userQRData.toString(), null, QRGContents.Type.TEXT, smallerDimension)
         try {
             // Getting QR-Code as Bitmap
             val bitmap = qrgEncoder.bitmap
@@ -61,7 +81,8 @@ class AddFriend : Fragment() {
         }
 
         view.findViewById<Button>(R.id.button_qr).setOnClickListener {
-            view.findNavController().navigate(R.id.action_addFriend2_to_QRScanner)
+            val action = AddFriendDirections.actionAddFriend2ToQRScanner(keys.toString())
+            view?.findNavController()?.navigate(action)
         }
         return view
     }
@@ -70,5 +91,11 @@ class AddFriend : Fragment() {
         CryptoManager.destroyKeyPair(requireContext())
         super.onDestroy()
     }
+    private fun correctQR(data: String): Boolean {
+        return JSONObject(data).get("id").toString().isNotEmpty() && JSONObject(data).get("publicKey").toString().isNotEmpty()
+    }
 
+    private fun addFriend(data: String) {
+        //TODO add to friends list
+    }
 }

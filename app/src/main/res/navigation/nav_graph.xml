@@ -25,12 +25,6 @@
             app:popEnterAnim="@anim/fragment_open_enter"
             app:popExitAnim="@anim/fragment_open_exit"
             app:popUpToInclusive="false" />
-        <argument
-            android:name="QRData"
-            app:argType="string" />
-        <argument
-            android:name="comesFromQR"
-            app:argType="boolean" />
     </fragment>
     <fragment
         android:id="@+id/addFriend2"
@@ -40,14 +34,23 @@
         <action
             android:id="@+id/action_addFriend2_to_QRScanner"
             app:destination="@id/QRScanner" />
+        <argument
+            android:name="QRData"
+            app:argType="string" />
+        <argument
+            android:name="fromQR"
+            app:argType="boolean" />
     </fragment>
     <fragment
         android:id="@+id/QRScanner"
         android:name="ch.friender.QRScanner"
         android:label="QRScanner" >
         <action
-            android:id="@+id/action_QRScanner_to_friendsList"
-            app:destination="@id/friendsList" />
+            android:id="@+id/action_QRScanner_to_addFriend2"
+            app:destination="@id/addFriend2" />
+        <argument
+            android:name="keys"
+            app:argType="string" />
     </fragment>
 
 </navigation>

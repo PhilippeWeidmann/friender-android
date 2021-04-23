@@ -18,30 +18,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 class FriendsList : Fragment() {
 
     private var testData = arrayOf("test1", "test2", "test3")
-    private var QRData: String = ""
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        QRData = arguments?.get("QRData").toString()
-        if (arguments?.getBoolean("comesFromQR") == true) {
-            if (QRData != "") {
-                Log.d("QRDATA", "" + QRData)
-                if (correctQR(QRData)) {
-                    addFriend(QRData)
-                } else {
-                    MaterialAlertDialogBuilder(requireContext())
-                            .setTitle("Could not add friend")
-                            .setMessage("The QR scanned was not a correct Friender QR, please try again")
-                            .setPositiveButton("OK") { dialog, _ ->
-                                dialog.dismiss()
-                            }
-                            .show()
-                }
-            }
-        }
-
-        Log.d("QRDATA", "" + QRData)
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -99,13 +76,6 @@ class FriendsList : Fragment() {
 
     }
 
-    private fun correctQR(data: String): Boolean {
-        //TODO check if ID is correct
-        return false
-    }
 
-    private fun addFriend(data: String) {
-        //TODO add to friends list
-    }
 
 }
