@@ -1,7 +1,6 @@
 package ch.friender
 
 import android.content.Context
-import android.content.Intent
 import android.content.res.Resources
 import android.os.Bundle
 import android.util.Log
@@ -15,6 +14,7 @@ import android.widget.TextView
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
 import androidx.fragment.app.FragmentActivity
+import androidx.navigation.findNavController
 import ch.friender.cryptography.CryptoManager
 import com.google.zxing.WriterException
 import org.json.JSONObject
@@ -27,7 +27,6 @@ class AddFriend : Fragment() {
         //crypto
         val sharedPreferencesCrypto = requireActivity().getSharedPreferences("keys", FragmentActivity.MODE_PRIVATE)
         CryptoManager.generateKeyPair(requireContext())
-        //var keys = JSONObject(sharedPreferencesCrypto.getString("keyPair", "no keys"))
         var keys = JSONObject("{\"secretKey\":\"\",\"publicKey\":\"\"}")
 
         if (sharedPreferencesCrypto.getString("keyPair", "no keys") == "no keys") {
@@ -42,8 +41,8 @@ class AddFriend : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_add_friend, container, false)
+
         val width: Int = Resources.getSystem().displayMetrics.widthPixels
         val height: Int = Resources.getSystem().displayMetrics.heightPixels
         var smallerDimension = if (width < height) width else height
@@ -60,9 +59,9 @@ class AddFriend : Fragment() {
         } catch (e: WriterException) {
             Log.v("error", e.toString())
         }
+
         view.findViewById<Button>(R.id.button_qr).setOnClickListener {
-            val intent = Intent(requireContext(), ScannedBarcodeActivity::class.java)
-            startActivity(intent)
+            view.findNavController().navigate(R.id.action_addFriend2_to_QRScanner)
         }
         return view
     }

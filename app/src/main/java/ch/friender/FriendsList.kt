@@ -1,27 +1,46 @@
 package ch.friender
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
-
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 
 class FriendsList : Fragment() {
 
-    private var columnCount = 1
-    private val ARG_COLUMN_COUNT = "column-count"
+    private var testData = arrayOf("test1", "test2", "test3")
+    private var QRData: String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            columnCount = it.getInt(ARG_COLUMN_COUNT)
+        QRData = arguments?.get("QRData").toString()
+        if (arguments?.getBoolean("comesFromQR") == true) {
+            if (QRData != "") {
+                Log.d("QRDATA", "" + QRData)
+                if (correctQR(QRData)) {
+                    addFriend(QRData)
+                } else {
+                    MaterialAlertDialogBuilder(requireContext())
+                            .setTitle("Could not add friend")
+                            .setMessage("The QR scanned was not a correct Friender QR, please try again")
+                            .setPositiveButton("OK") { dialog, _ ->
+                                dialog.dismiss()
+                            }
+                            .show()
+                }
+            }
         }
+
+        Log.d("QRDATA", "" + QRData)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -38,19 +57,55 @@ class FriendsList : Fragment() {
                 else -> false
             }
         }
-
-        // Set the adapter
-        if (view is RecyclerView) {
-            with(view) {
-                layoutManager = when {
-                    columnCount <= 1 -> LinearLayoutManager(context)
-                    else -> GridLayoutManager(context, columnCount)
-                }
-                //adapter = MyItemRecyclerViewAdapter2()
-            }
-        }
+        val recyclerView = view.findViewById<RecyclerView>(R.id.list)
+        val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+        val dividerItemDecoration = DividerItemDecoration(recyclerView.context,
+                layoutManager.orientation)
+        recyclerView.addItemDecoration(dividerItemDecoration)
+        recyclerView.adapter = FriendsListAdapter(testData)
         return view
     }
 
+    class FriendsListAdapter(private val dataSet: Array<String>) :
+            RecyclerView.Adapter<FriendsListAdapter.ViewHolder>() {
+        class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+            val textView: TextView = view.findViewById(R.id.content)
+
+            init {
+                // Define click listener for the ViewHolder's View.
+                textView.setOnClickListener {
+                    Log.d("test", "test")
+                }
+            }
+        }
+
+        override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
+            // Create a new view, which defines the UI of the list item
+            val view = LayoutInflater.from(viewGroup.context)
+                    .inflate(R.layout.fragment_friends_list, viewGroup, false)
+            return ViewHolder(view)
+        }
+
+        // Replace the contents of a view (invoked by the layout manager)
+        override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
+
+            // Get element from your dataset at this position and replace the
+            // contents of the view with that element
+            viewHolder.textView.text = dataSet[position]
+        }
+
+        // Return the size of your dataset (invoked by the layout manager)
+        override fun getItemCount() = dataSet.size
+
+    }
+
+    private fun correctQR(data: String): Boolean {
+        //TODO check if ID is correct
+        return false
+    }
+
+    private fun addFriend(data: String) {
+        //TODO add to friends list
+    }
 
 }

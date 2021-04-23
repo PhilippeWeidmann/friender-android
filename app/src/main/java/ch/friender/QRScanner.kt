@@ -4,60 +4,49 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.SparseArray
-import android.view.SurfaceHolder
-import android.view.SurfaceView
-import android.view.View
-import android.widget.Button
+import android.view.*
 import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
 import java.io.IOException
 
-class ScannedBarcodeActivity : AppCompatActivity() {
+
+class QRScanner : Fragment() {
     var surfaceView: SurfaceView? = null
     var txtBarcodeValue: TextView? = null
     private lateinit var barcodeDetector: BarcodeDetector
     private var cameraSource: CameraSource? = null
-    var btnAction: Button? = null
     var intentData = ""
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_scanned_barcode)
-        initViews()
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view = inflater.inflate(R.layout.activity_scanned_barcode, container, false)
+        txtBarcodeValue = view.findViewById(R.id.txtBarcodeValue)
+        surfaceView = view.findViewById(R.id.surfaceView)
+
+        return view
     }
 
-    private fun initViews() {
-        txtBarcodeValue = findViewById(R.id.txtBarcodeValue)
-        surfaceView = findViewById(R.id.surfaceView)
-        btnAction = findViewById(R.id.btnAction)
-        btnAction?.setOnClickListener(View.OnClickListener {
-            if (intentData.isNotEmpty()) {
-
-            }
-        })
-    }
 
     private fun initialiseDetectorsAndSources() {
-        Toast.makeText(applicationContext, "Barcode scanner started", Toast.LENGTH_SHORT).show()
-        barcodeDetector = BarcodeDetector.Builder(this)
+        barcodeDetector = BarcodeDetector.Builder(requireContext())
                 .setBarcodeFormats(Barcode.ALL_FORMATS)
                 .build()
-        cameraSource = CameraSource.Builder(this, barcodeDetector)
+        cameraSource = CameraSource.Builder(requireContext(), barcodeDetector)
                 .setRequestedPreviewSize(1920, 1080)
                 .setAutoFocusEnabled(true) //you should add this feature
                 .build()
         surfaceView!!.holder.addCallback(object : SurfaceHolder.Callback {
             override fun surfaceCreated(holder: SurfaceHolder) {
                 try {
-                    if (ActivityCompat.checkSelfPermission(this@ScannedBarcodeActivity, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                         cameraSource?.start(surfaceView!!.holder)
                     } else {
-                        ActivityCompat.requestPermissions(this@ScannedBarcodeActivity, arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION)
+                        ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION)
                     }
                 } catch (e: IOException) {
                     e.printStackTrace()
@@ -71,7 +60,6 @@ class ScannedBarcodeActivity : AppCompatActivity() {
         })
         barcodeDetector.setProcessor(object : Detector.Processor<Barcode?> {
             override fun release() {
-                Toast.makeText(applicationContext, "barcode scanner has been stopped", Toast.LENGTH_SHORT).show()
             }
 
             override fun receiveDetections(detections: Detector.Detections<Barcode?>) {
@@ -80,8 +68,8 @@ class ScannedBarcodeActivity : AppCompatActivity() {
                     txtBarcodeValue!!.post {
                         txtBarcodeValue!!.removeCallbacks(null)
                         intentData = barcodes.valueAt(0)!!.rawValue
-                        txtBarcodeValue!!.text = intentData
-                        btnAction!!.text = "ADD FRIEND"
+                        val action = QRScannerDirections.actionQRScannerToFriendsList(intentData, true)
+                        view?.findNavController()?.navigate(action)
                     }
                 }
             }
