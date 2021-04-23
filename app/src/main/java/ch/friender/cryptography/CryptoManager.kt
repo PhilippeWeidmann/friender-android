@@ -2,12 +2,10 @@ package ch.friender.cryptography
 
 import android.content.Context
 import android.util.Log
-import androidx.fragment.app.FragmentActivity
-import ch.friender.MainActivity
-import ch.friender.networking.ApiFetcher
 import com.goterl.lazysodium.LazySodiumAndroid
 import com.goterl.lazysodium.SodiumAndroid
 import com.goterl.lazysodium.interfaces.Box
+import com.goterl.lazysodium.interfaces.SecretBox
 import com.goterl.lazysodium.utils.Key
 import com.goterl.lazysodium.utils.KeyPair
 import org.json.JSONObject
@@ -42,11 +40,17 @@ object CryptoManager {
         Log.i("crypto keys manager ", "destroyed keys")
     }
 
-    fun encrypt(message: String, friendPublicKey: Key): String {
-        return boxLazy.cryptoBoxSealEasy(message, friendPublicKey)
+    fun encrypt(message: String, friendPublicKey: Key, mySecretKey: Key): String {
+        val nonce = lazySodium.nonce(SecretBox.NONCEBYTES)
+        val keyPair = KeyPair(friendPublicKey, mySecretKey)
+
+        return boxLazy.cryptoBoxEasy(message, nonce, keyPair)
     }
 
-    fun decrypt(cypher: String, myKeys: KeyPair): String {
-        return boxLazy.cryptoBoxSealOpenEasy(cypher, myKeys)
+    fun decrypt(cypher: String, friendPublicKey: Key, mySecretKey: Key): String {
+        val nonce = cypher.substring(0, SecretBox.NONCEBYTES).toByteArray()
+        val keyPair = KeyPair(friendPublicKey, mySecretKey)
+
+        return boxLazy.cryptoBoxOpenEasy(cypher, nonce, keyPair)
     }
 }
