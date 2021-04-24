@@ -1,10 +1,11 @@
 package ch.friender
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.res.Resources
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,16 +14,21 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.findNavController
 import ch.friender.cryptography.CryptoManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.gson.Gson
 import com.google.zxing.WriterException
+import org.json.JSONArray
 import org.json.JSONObject
+import java.nio.charset.StandardCharsets
+
 
 class AddFriend : Fragment() {
 
-    private lateinit var keys:JSONObject
+    private lateinit var keys: JSONObject
     private var QRData = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,19 +43,20 @@ class AddFriend : Fragment() {
         } else {
             keys = JSONObject(sharedPreferencesCrypto.getString("keyPair", "no keys"))
         }
-        if (arguments?.getBoolean("comesFromQR") == true) {
+        if (arguments?.getBoolean("fromQR") == true) {
+            QRData = arguments?.getString("QRData").toString()
             if (QRData != "") {
                 Log.d("QRDATA", "" + QRData)
                 if (correctQR(QRData)) {
-                    addFriend(QRData)
+                    val newFriend = Friend(JSONObject(QRData).getString("id"), JSONObject(QRData).getString("publicKey"), keys.getString("secretKey"))
+                    FriendManager().initWithContext(requireContext())
+                    if (FriendManager().addFriend(newFriend)) {
+
+                    } else {
+                        displayError(1)
+                    }
                 } else {
-                    MaterialAlertDialogBuilder(requireContext())
-                            .setTitle("Could not add friend")
-                            .setMessage("The QR scanned was not a correct Friender QR, please try again")
-                            .setPositiveButton("OK") { dialog, _ ->
-                                dialog.dismiss()
-                            }
-                            .show()
+                    displayError(2)
                 }
             }
         }
@@ -68,13 +75,12 @@ class AddFriend : Fragment() {
         val id = activity?.getPreferences(Context.MODE_PRIVATE)?.getString("id", "")
         view.findViewById<TextView>(R.id.id_textview).text = id
         val userQRData = JSONObject()
-        userQRData.put("id",id)
-        userQRData.put("publicKey",keys.get("publicKey"))
-        val qrgEncoder = QRGEncoder(userQRData.toString(), null, QRGContents.Type.TEXT, smallerDimension)
+        userQRData.put("id", id)
+        userQRData.put("publicKey", keys.get("publicKey"))
+        val userQRDataString = Base64.encodeToString(userQRData.toString().toByteArray(StandardCharsets.UTF_8), Base64.DEFAULT)
+        val qrgEncoder = QRGEncoder(userQRDataString, null, QRGContents.Type.TEXT, smallerDimension)
         try {
-            // Getting QR-Code as Bitmap
             val bitmap = qrgEncoder.bitmap
-            // Setting Bitmap to ImageView
             image.setImageBitmap(bitmap)
         } catch (e: WriterException) {
             Log.v("error", e.toString())
@@ -91,11 +97,29 @@ class AddFriend : Fragment() {
         CryptoManager.destroyKeyPair(requireContext())
         super.onDestroy()
     }
+
     private fun correctQR(data: String): Boolean {
         return JSONObject(data).get("id").toString().isNotEmpty() && JSONObject(data).get("publicKey").toString().isNotEmpty()
     }
 
-    private fun addFriend(data: String) {
-        //TODO add to friends list
+    private fun displayError(case: Int) {
+        if (case == 1) {
+            MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Could not add friend")
+                    .setMessage("Your are already friend with this person")
+                    .setPositiveButton("OK") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
+        } else {
+            MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Could not add friend")
+                    .setMessage("The QR scanned was not a correct Friender QR, please try again")
+                    .setPositiveButton("OK") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
+        }
+
     }
 }

@@ -3,6 +3,8 @@ package ch.friender
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Base64
+import android.util.Log
 import android.util.SparseArray
 import android.view.*
 import android.widget.TextView
@@ -14,6 +16,7 @@ import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
 import java.io.IOException
+import java.nio.charset.StandardCharsets
 
 
 class QRScanner : Fragment() {
@@ -74,6 +77,7 @@ class QRScanner : Fragment() {
                     txtBarcodeValue!!.post {
                         txtBarcodeValue!!.removeCallbacks(null)
                         intentData = barcodes.valueAt(0)!!.rawValue
+                        intentData = String(Base64.decode(intentData.toByteArray(StandardCharsets.UTF_8),Base64.DEFAULT),StandardCharsets.UTF_8)
                         val action = QRScannerDirections.actionQRScannerToAddFriend2(intentData, true)
                         view?.findNavController()?.navigate(action)
                     }

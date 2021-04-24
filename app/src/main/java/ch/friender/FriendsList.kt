@@ -12,19 +12,15 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+
 
 
 class FriendsList : Fragment() {
-
-    private var testData = arrayOf("test1", "test2", "test3")
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_friends_list_list, container, false)
         val topAppBar: MaterialToolbar = view.findViewById(R.id.topAppBar)
-
         topAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.addFriend -> {
@@ -34,12 +30,19 @@ class FriendsList : Fragment() {
                 else -> false
             }
         }
+
+        FriendManager().initWithContext(requireContext())
+        val friends = FriendManager().friends
+        val friendsID = arrayOf<String>()
+        for(i in 0 until friends.size){
+            friendsID[i] = friends[i].id
+        }
         val recyclerView = view.findViewById<RecyclerView>(R.id.list)
         val layoutManager = recyclerView.layoutManager as LinearLayoutManager
         val dividerItemDecoration = DividerItemDecoration(recyclerView.context,
                 layoutManager.orientation)
         recyclerView.addItemDecoration(dividerItemDecoration)
-        recyclerView.adapter = FriendsListAdapter(testData)
+        recyclerView.adapter = FriendsListAdapter(friendsID)
         return view
     }
 
@@ -75,7 +78,6 @@ class FriendsList : Fragment() {
         override fun getItemCount() = dataSet.size
 
     }
-
 
 
 }

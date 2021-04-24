@@ -47,6 +47,8 @@
         android:label="QRScanner" >
         <action
             android:id="@+id/action_QRScanner_to_addFriend2"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true"
             app:destination="@id/addFriend2" />
         <argument
             android:name="keys"
