@@ -2,25 +2,28 @@ package ch.friender
 
 import android.content.Context
 import com.google.gson.Gson
-import org.json.JSONArray
+import com.google.gson.reflect.TypeToken
 
-class FriendManager {
+object FriendManager {
 
     var friends = ArrayList<Friend>()
 
-    fun addFriend(friend:Friend):Boolean{
-        return if(!friends.contains(friend)){
+    fun addFriend(friend: Friend, context: Context): Boolean {
+        return if (!friends.contains(friend)) {
             friends.add(friend)
+            val prefs = context.getSharedPreferences("friends", Context.MODE_PRIVATE)
+            val editor = prefs.edit()
+            editor.putString("friends", Gson().toJson(friends))
+            editor.apply()
             true
-        }else{
+        } else {
             false
         }
     }
 
-    fun initWithContext(context: Context){
+    fun initWithContext(context: Context) {
         val prefs = context.getSharedPreferences("friends", Context.MODE_PRIVATE)
-        for (i in 0 until JSONArray(prefs.getString("friends", "")).length()) {
-            friends.add(Gson().fromJson(Gson().toJson(JSONArray(prefs.getString("friends","")).getJSONObject(i)), Friend::class.java))
-        }
+        val friendArrayType = object : TypeToken<ArrayList<Friend>>() {}.type
+        friends = Gson().fromJson(prefs.getString("friends", "[]"), friendArrayType)
     }
 }

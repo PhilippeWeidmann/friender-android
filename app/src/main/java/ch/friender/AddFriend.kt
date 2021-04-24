@@ -49,14 +49,12 @@ class AddFriend : Fragment() {
                 Log.d("QRDATA", "" + QRData)
                 if (correctQR(QRData)) {
                     val newFriend = Friend(JSONObject(QRData).getString("id"), JSONObject(QRData).getString("publicKey"), keys.getString("secretKey"))
-                    FriendManager().initWithContext(requireContext())
-                    if (FriendManager().addFriend(newFriend)) {
-
-                    } else {
-                        displayError(1)
+                    FriendManager.initWithContext(requireContext())
+                    if (!FriendManager.addFriend(newFriend, requireContext())) {
+                        displayError("Already friend", "You are already friend with this person")
                     }
                 } else {
-                    displayError(2)
+                    displayError("Wrong QR code", "The scanned QR was not a Friender QR")
                 }
             }
         }
@@ -102,24 +100,13 @@ class AddFriend : Fragment() {
         return JSONObject(data).get("id").toString().isNotEmpty() && JSONObject(data).get("publicKey").toString().isNotEmpty()
     }
 
-    private fun displayError(case: Int) {
-        if (case == 1) {
-            MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Could not add friend")
-                    .setMessage("Your are already friend with this person")
-                    .setPositiveButton("OK") { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    .show()
-        } else {
-            MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Could not add friend")
-                    .setMessage("The QR scanned was not a correct Friender QR, please try again")
-                    .setPositiveButton("OK") { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    .show()
-        }
-
+    private fun displayError(title: String, message: String) {
+        MaterialAlertDialogBuilder(requireContext())
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
     }
 }

@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 
 
-
 class FriendsList : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -31,22 +30,19 @@ class FriendsList : Fragment() {
             }
         }
 
-        FriendManager().initWithContext(requireContext())
-        val friends = FriendManager().friends
-        val friendsID = arrayOf<String>()
-        for(i in 0 until friends.size){
-            friendsID[i] = friends[i].id
-        }
+        FriendManager.initWithContext(requireContext())
+        val friends = FriendManager.friends
+        Log.d("test",""+friends.size)
         val recyclerView = view.findViewById<RecyclerView>(R.id.list)
         val layoutManager = recyclerView.layoutManager as LinearLayoutManager
         val dividerItemDecoration = DividerItemDecoration(recyclerView.context,
                 layoutManager.orientation)
         recyclerView.addItemDecoration(dividerItemDecoration)
-        recyclerView.adapter = FriendsListAdapter(friendsID)
+        recyclerView.adapter = FriendsListAdapter(friends)
         return view
     }
 
-    class FriendsListAdapter(private val dataSet: Array<String>) :
+    class FriendsListAdapter(private val dataSet: ArrayList<Friend>) :
             RecyclerView.Adapter<FriendsListAdapter.ViewHolder>() {
         class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val textView: TextView = view.findViewById(R.id.content)
@@ -71,7 +67,7 @@ class FriendsList : Fragment() {
 
             // Get element from your dataset at this position and replace the
             // contents of the view with that element
-            viewHolder.textView.text = dataSet[position]
+            viewHolder.textView.text = dataSet.get(position).id
         }
 
         // Return the size of your dataset (invoked by the layout manager)
