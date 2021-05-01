@@ -4,13 +4,11 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Base64
-import android.util.Log
 import android.util.SparseArray
 import android.view.*
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.navigation.findNavController
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.barcode.Barcode
@@ -77,9 +75,8 @@ class QRScanner : Fragment() {
                     txtBarcodeValue!!.post {
                         txtBarcodeValue!!.removeCallbacks(null)
                         intentData = barcodes.valueAt(0)!!.rawValue
-                        intentData = String(Base64.decode(intentData.toByteArray(StandardCharsets.UTF_8),Base64.DEFAULT),StandardCharsets.UTF_8)
-                        val action = QRScannerDirections.actionQRScannerToAddFriend2(intentData, true)
-                        view?.findNavController()?.navigate(action)
+                        intentData = String(Base64.decode(intentData.toByteArray(StandardCharsets.UTF_8), Base64.DEFAULT), StandardCharsets.UTF_8)
+                        (activity as AddFriendActivity?)?.addFriendFromQR(intentData)
                     }
                 }
             }

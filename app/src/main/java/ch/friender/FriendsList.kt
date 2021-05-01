@@ -1,5 +1,6 @@
 package ch.friender
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -7,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,7 +23,9 @@ class FriendsList : Fragment() {
         topAppBar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.addFriend -> {
-                    view.findNavController().navigate(R.id.action_friendsList_to_addFriend2)
+                    val intent = Intent(requireContext(), AddFriendActivity::class.java).apply {
+                    }
+                    startActivity(intent)
                     true
                 }
                 else -> false

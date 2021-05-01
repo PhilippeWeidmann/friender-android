@@ -15,44 +15,27 @@
         android:id="@+id/friendsList"
         android:name="ch.friender.FriendsList"
         android:label="fragment_friends_list"
-        tools:layout="@layout/fragment_friends_list" >
-        <action
-            android:id="@+id/action_friendsList_to_addFriend2"
-            app:destination="@id/addFriend2"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:launchSingleTop="false"
-            app:popEnterAnim="@anim/fragment_open_enter"
-            app:popExitAnim="@anim/fragment_open_exit"
-            app:popUpToInclusive="false" />
-    </fragment>
-    <fragment
-        android:id="@+id/addFriend2"
-        android:name="ch.friender.AddFriend"
-        android:label="fragment_add_friend"
-        tools:layout="@layout/fragment_add_friend" >
-        <action
-            android:id="@+id/action_addFriend2_to_QRScanner"
-            app:destination="@id/QRScanner" />
-        <argument
-            android:name="QRData"
-            app:argType="string" />
-        <argument
-            android:name="fromQR"
-            app:argType="boolean" />
-    </fragment>
+        tools:layout="@layout/fragment_friends_list" />
     <fragment
         android:id="@+id/QRScanner"
         android:name="ch.friender.QRScanner"
         android:label="QRScanner" >
         <action
-            android:id="@+id/action_QRScanner_to_addFriend2"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true"
-            app:destination="@id/addFriend2" />
-        <argument
-            android:name="keys"
-            app:argType="string" />
+            android:id="@+id/action_QRScanner_to_addFriendFragment"
+            app:destination="@id/addFriendFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/addFriendFragment"
+        android:name="ch.friender.AddFriendFragment"
+        android:label="AddFriendFragment" >
+        <action
+            android:id="@+id/action_addFriendFragment_to_QRScanner"
+            app:destination="@id/QRScanner" />
+    </fragment>
+    <activity
+        android:id="@+id/addFriendActivity"
+        android:name="ch.friender.AddFriendActivity"
+        android:label="fragment_add_friend"
+        tools:layout="@layout/fragment_add_friend" />
 
 </navigation>

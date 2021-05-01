@@ -38,11 +38,13 @@ class MainActivity : FragmentActivity() {
         val navController = findNavController(R.id.nav_host_fragment)
         bottomNavigationView.setupWithNavController(navController)
 
-        val sharedPreferences = getPreferences(MODE_PRIVATE)
+        val sharedPreferences = getSharedPreferences("id",MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         if (sharedPreferences.getString("id", "") == "") {
             ApiFetcher.registerUser { userId, error ->
+                Log.d("new id","NOK")
                 userId?.let {
+                    Log.d("new id",""+userId)
                     editor.putString("id", it)
                     editor.apply()
                 }
