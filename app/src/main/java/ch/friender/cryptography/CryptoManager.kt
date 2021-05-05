@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.goterl.lazysodium.LazySodiumAndroid
 import com.goterl.lazysodium.SodiumAndroid
+import com.goterl.lazysodium.exceptions.SodiumException
 import com.goterl.lazysodium.interfaces.Box
 import com.goterl.lazysodium.interfaces.SecretBox
 import com.goterl.lazysodium.utils.Key
@@ -50,7 +51,10 @@ object CryptoManager {
     fun decrypt(cypher: String, friendPublicKey: Key, mySecretKey: Key): String {
         val nonce = cypher.substring(0, SecretBox.NONCEBYTES).toByteArray()
         val keyPair = KeyPair(friendPublicKey, mySecretKey)
-
-        return boxLazy.cryptoBoxOpenEasy(cypher, nonce, keyPair)
+        return try {
+            boxLazy.cryptoBoxOpenEasy(cypher, nonce, keyPair)
+        } catch (e:SodiumException){
+            ""
+        }
     }
 }

@@ -2,12 +2,22 @@ package ch.friender
 
 import android.content.Context
 import android.util.Log
+import ch.friender.networking.ApiFetcher
+import com.google.android.gms.common.api.Api
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
 object FriendManager {
 
     var friends = ArrayList<Friend>()
+    var userId = ""
+
+    fun initWithContext(context: Context) {
+        val prefs = context.getSharedPreferences("friends", Context.MODE_PRIVATE)
+        val friendArrayType = object : TypeToken<ArrayList<Friend>>() {}.type
+        friends = Gson().fromJson(prefs.getString("friends", "[]"), friendArrayType)
+        userId = context.getSharedPreferences("id", Context.MODE_PRIVATE).getString("id", "").toString()
+    }
 
     fun addFriend(friend: Friend, context: Context): Boolean {
         return if (!friends.contains(friend)) {
@@ -22,9 +32,32 @@ object FriendManager {
         }
     }
 
-    fun initWithContext(context: Context) {
-        val prefs = context.getSharedPreferences("friends", Context.MODE_PRIVATE)
-        val friendArrayType = object : TypeToken<ArrayList<Friend>>() {}.type
-        friends = Gson().fromJson(prefs.getString("friends", "[]"), friendArrayType)
+    fun getFriendsLocations(context: Context) {
+        for (friend in friends) {
+            ApiFetcher.initWithContext(context)
+            ApiFetcher.getLocation(friend, userId) { location, error ->
+                location?.let {
+                    Log.d("location", " -> $location")
+                }
+                error?.let {
+                    Log.e("get location error", "" + error)
+                }
+            }
+        }
     }
+
+    fun sendUpdatedLocation(context: Context, location: String) {
+        for (friend in friends) {
+            ApiFetcher.initWithContext(context)
+            ApiFetcher.sendLocation(friend, userId, location) { res, error ->
+                res?.let {
+                    Log.d("sent location", res)
+                }
+                error?.let {
+                    Log.e("send location error", "" + error)
+                }
+            }
+        }
+    }
+
 }

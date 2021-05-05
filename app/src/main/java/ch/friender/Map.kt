@@ -2,11 +2,9 @@ package ch.friender
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -14,8 +12,6 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
-import com.mapbox.geojson.Feature
-import com.mapbox.geojson.FeatureCollection
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
@@ -29,12 +25,10 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.maps.Style.OnStyleLoaded
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
-import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT
-import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import com.mapbox.mapboxsdk.utils.BitmapUtils
-import org.json.JSONArray
-import org.json.JSONObject
+import java.util.*
+import kotlin.concurrent.fixedRateTimer
 
 
 class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
@@ -42,7 +36,7 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
     private lateinit var mapboxMap: MapboxMap
     private lateinit var mapView: MapView
     private val ICON_MARKER: String = "basic-marker"
-
+    private val timer = Timer()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Mapbox.getInstance(requireActivity(), getString(R.string.mapbox_access_token))
@@ -86,7 +80,20 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
             addMarkerImageToStyle(style)
             // create symbol manager object
             val symbolManager = SymbolManager(mapView, mapboxMap, style)
-            //test data
+            timer.scheduleAtFixedRate(object : TimerTask() {
+                override fun run() {
+                    //your method
+                    if(isAdded){
+                        FriendManager.initWithContext(requireActivity())
+                        FriendManager.getFriendsLocations(requireActivity())
+                        val currentLatitude = ch.friender.persistence.LocationManager.currentLatitude
+                        val currentLongitude = ch.friender.persistence.LocationManager.currentLongitude
+                        FriendManager.sendUpdatedLocation(requireActivity(), "{\"latitude\":$currentLatitude, \"longitude\":$currentLongitude}")
+                    }
+                }
+            }, 0, 5000) //put here time 1000 milliseconds=1 second
+
+            /*
             val testArray = JSONArray()
             testArray.put(JSONObject("""{"lat":46.2,"long":6.1670,"name1":"John","name2":"Doe"}"""))
             testArray.put(JSONObject("""{"lat":46.201,"long":6.1680,"name1":"Jesse","name2":"Doe"}"""))
@@ -111,7 +118,7 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
                     expandSheet()
                 }
                 true
-            }
+            }*/
             // set non-data-driven properties, such as:
             symbolManager.iconAllowOverlap = true
             symbolManager.iconTranslate = arrayOf(-4f, 5f)
@@ -204,6 +211,7 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
 
     override fun onDestroy() {
         super.onDestroy()
+
         mapView.onDestroy()
     }
 

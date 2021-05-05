@@ -30,7 +30,7 @@ class MainActivity : FragmentActivity() {
         setContentView(R.layout.activity_main)
         firstLaunch = true
         //foreground permission
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1234)
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission_group.LOCATION), 1234)
         ApiFetcher.initWithContext(this)
         LocationManager.initWithContext(this)
 
