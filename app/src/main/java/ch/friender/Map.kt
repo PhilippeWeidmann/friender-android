@@ -2,6 +2,7 @@ package ch.friender
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,9 +26,12 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.maps.Style.OnStyleLoaded
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.style.layers.Property.ICON_ROTATION_ALIGNMENT_VIEWPORT
 import com.mapbox.mapboxsdk.utils.BitmapUtils
+import org.json.JSONObject
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.concurrent.fixedRateTimer
 
 
@@ -42,8 +46,10 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
         Mapbox.getInstance(requireActivity(), getString(R.string.mapbox_access_token))
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_map, container, false)
         mapView = view.findViewById(R.id.mapView)
@@ -64,10 +70,15 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
             mapboxMap.getStyle(this::addMarkerImageToStyle)
             if (mapboxMap.locationComponent.lastKnownLocation != null) {
                 val position = CameraPosition.Builder()
-                        .target(LatLng(mapboxMap.locationComponent.lastKnownLocation!!.latitude, mapboxMap.locationComponent.lastKnownLocation!!.longitude))
-                        .zoom(14.0)
-                        .tilt(0.0)
-                        .build()
+                    .target(
+                        LatLng(
+                            mapboxMap.locationComponent.lastKnownLocation!!.latitude,
+                            mapboxMap.locationComponent.lastKnownLocation!!.longitude
+                        )
+                    )
+                    .zoom(14.0)
+                    .tilt(0.0)
+                    .build()
                 if ((activity as? MainActivity)?.firstLaunch == true) {
                     mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position), 2000)
                     (activity as? MainActivity)?.firstLaunch = false
@@ -79,50 +90,44 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
             //add marker image to style
             addMarkerImageToStyle(style)
             // create symbol manager object
-            val symbolManager = SymbolManager(mapView, mapboxMap, style)
+            val symbolOptions = ArrayList<SymbolOptions>()
             timer.scheduleAtFixedRate(object : TimerTask() {
                 override fun run() {
                     //your method
-                    if(isAdded){
+                    if (isAdded) {
                         FriendManager.initWithContext(requireActivity())
-                        FriendManager.getFriendsLocations(requireActivity())
-                        val currentLatitude = ch.friender.persistence.LocationManager.currentLatitude
-                        val currentLongitude = ch.friender.persistence.LocationManager.currentLongitude
-                        FriendManager.sendUpdatedLocation(requireActivity(), "{\"latitude\":$currentLatitude, \"longitude\":$currentLongitude}")
+                        val locations = FriendManager.getFriendsLocations(requireActivity())
+                        val currentLatitude =
+                            ch.friender.persistence.LocationManager.currentLatitude
+                        val currentLongitude =
+                            ch.friender.persistence.LocationManager.currentLongitude
+                        if (currentLatitude != 0.0 && currentLongitude != 0.0) {
+                            FriendManager.sendUpdatedLocation(
+                                requireActivity(),
+                                "{\"latitude\":$currentLatitude, \"longitude\":$currentLongitude}"
+                            )
+                        }
+                        for (location in locations) {
+                            val latLoop = JSONObject(location).get("latitude")
+                            val longLoop = JSONObject(location).get("longitude")
+                            symbolOptions.add(
+                                SymbolOptions().withLatLng(
+                                    LatLng(
+                                        latLoop as Double,
+                                        longLoop as Double
+                                    )
+                                ).withIconImage(ICON_MARKER).withIconSize(1.0f)
+                            )
+                        }
+                        //TODO display markers
+                        //val symbolManager = SymbolManager(mapView, mapboxMap, style)
+                        //symbolManager.create(symbolOptions)
                     }
                 }
-            }, 0, 5000) //put here time 1000 milliseconds=1 second
+            }, 0, 5000)
 
-            /*
-            val testArray = JSONArray()
-            testArray.put(JSONObject("""{"lat":46.2,"long":6.1670,"name1":"John","name2":"Doe"}"""))
-            testArray.put(JSONObject("""{"lat":46.201,"long":6.1680,"name1":"Jesse","name2":"Doe"}"""))
-            testArray.put(JSONObject("""{"lat":46.2,"long":6.1690,"name1":"Jane","name2":"Doe"}"""))
-            for (i in 0 until testArray.length()) {
-                Log.d("test", testArray.getJSONObject(i).toString())
-                val latLoop = testArray.getJSONObject(i).get("lat")
-                val longLoop = testArray.getJSONObject(i).get("long")
-                val symbol = symbolManager.create(SymbolOptions()
-                        .withLatLng(LatLng(latLoop as Double, longLoop as Double))
-                        .withIconImage(ICON_MARKER)
-                        .withIconSize(1.0f))
-            }
-            // add click listeners
-            symbolManager.addClickListener {
-                Log.d("test", it.id.toString())
-                val bottomSheet = requireView().findViewById<ConstraintLayout>(R.id.bottom_sheet)
-                bottomSheet.findViewById<TextView>(R.id.name).text = testArray.getJSONObject(it.id.toInt()).get("name1").toString()
-                bottomSheet.findViewById<TextView>(R.id.surname).text = testArray.getJSONObject(it.id.toInt()).get("name2").toString()
-                val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
-                if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
-                    expandSheet()
-                }
-                true
-            }*/
-            // set non-data-driven properties, such as:
-            symbolManager.iconAllowOverlap = true
-            symbolManager.iconTranslate = arrayOf(-4f, 5f)
-            symbolManager.iconRotationAlignment = ICON_ROTATION_ALIGNMENT_VIEWPORT
+
+
 
             mapboxMap.addOnMapClickListener {
                 val bottomSheet = requireView().findViewById<ConstraintLayout>(R.id.bottom_sheet)
@@ -136,9 +141,16 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
     }
 
     private fun addMarkerImageToStyle(style: Style) {
-        style.addImage(ICON_MARKER,
-                BitmapUtils.getBitmapFromDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.mapbox_marker_icon_20px_blue))!!,
-                false)
+        style.addImage(
+            ICON_MARKER,
+            BitmapUtils.getBitmapFromDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.mapbox_marker_icon_20px_blue
+                )
+            )!!,
+            false
+        )
     }
 
     @SuppressLint("MissingPermission")
@@ -151,7 +163,9 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
 
             // Activate with options
             locationComponent.activateLocationComponent(
-                    LocationComponentActivationOptions.builder(requireActivity(), loadedMapStyle).build())
+                LocationComponentActivationOptions.builder(requireActivity(), loadedMapStyle)
+                    .build()
+            )
 
             // Enable to make component visible
             locationComponent.isLocationComponentEnabled = true
@@ -168,7 +182,11 @@ class Map : Fragment(), OnMapReadyCallback, PermissionsListener {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String?>,
+        grantResults: IntArray
+    ) {
         permissionsManager?.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 

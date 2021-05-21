@@ -40,33 +40,51 @@ object ApiFetcher {
     fun getLocation(friend: Friend, userId: String, completion: (String?, VolleyError?) -> Unit) {
         val locationURL = baseUrl + "location/" + friend.id + "/" + userId
         val request = StringRequest(Request.Method.GET, locationURL,
-                { res ->
-                    try {
-                        Log.d("result get",res.toString())
-                        val location = JSONObject(res).getJSONObject("data").getString("encryptedLocation")
-                        if(location.isNotEmpty()){
-                            val decodedLocation = CryptoManager.decrypt(location, Key.fromPlainString(friend.friendPublicKey), Key.fromPlainString(friend.myPrivateKey))
-                            completion(decodedLocation, null)
-                        }
-                        completion("", null)
-                    } catch (e: JSONException) {
-                        Log.d("error",e.toString())
-                        completion("", null)
+            { res ->
+                try {
+                    Log.d("result get", res.toString())
+                    val location =
+                        JSONObject(res).getJSONObject("data").getString("encryptedLocation")
+                    if (location.isNotEmpty()) {
+                        Log.d("test", friend.myPrivateKey)
+                        val decodedLocation = CryptoManager.decrypt(
+                            location,
+                            Key.fromHexString(friend.friendPublicKey),
+                            Key.fromHexString(friend.myPrivateKey)
+                        )
+                        completion(decodedLocation, null)
                     }
-                },
-                { completion(null, it) })
+                    completion("", null)
+                } catch (e: JSONException) {
+                    Log.d("error", e.toString())
+                    completion("", null)
+                }
+            },
+            { completion(null, it) })
         requestQueue.add(request)
     }
 
-    fun sendLocation(friend: Friend, userId: String, location: String, completion: (String?, VolleyError?) -> Unit) {
+    fun sendLocation(
+        friend: Friend,
+        userId: String,
+        location: String,
+        completion: (String?, VolleyError?) -> Unit
+    ) {
         val sendLocationURL = baseUrl + "location/" + userId + "/" + friend.id
-        val encodedLocation = CryptoManager.encrypt(location, Key.fromHexString(friend.friendPublicKey), Key.fromHexString(friend.myPrivateKey))
-        val request = JsonObjectRequest(Request.Method.POST, sendLocationURL, JSONObject("{\"encryptedLocation\":$encodedLocation}"),
+        val encodedLocation = CryptoManager.encrypt(
+            location,
+            Key.fromHexString(friend.friendPublicKey),
+            Key.fromHexString(friend.myPrivateKey)
+        )
+        if (encodedLocation != "") {
+            val request = JsonObjectRequest(Request.Method.POST,
+                sendLocationURL,
+                JSONObject("{\"encryptedLocation\":$encodedLocation}"),
                 { res ->
                     completion(res.getString("status"), null)
                 },
                 { completion(null, it) })
-        requestQueue.add(request)
+            requestQueue.add(request)
+        }
     }
-
 }

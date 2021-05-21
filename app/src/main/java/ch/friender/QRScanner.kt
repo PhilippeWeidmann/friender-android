@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Base64
+import android.util.Log
 import android.util.SparseArray
 import android.view.*
 import android.widget.TextView
@@ -30,7 +31,11 @@ class QRScanner : Fragment() {
         keys = arguments?.get("keys").toString()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val view = inflater.inflate(R.layout.activity_scanned_barcode, container, false)
         txtBarcodeValue = view.findViewById(R.id.txtBarcodeValue)
         surfaceView = view.findViewById(R.id.surfaceView)
@@ -41,26 +46,41 @@ class QRScanner : Fragment() {
 
     private fun initialiseDetectorsAndSources() {
         barcodeDetector = BarcodeDetector.Builder(requireContext())
-                .setBarcodeFormats(Barcode.ALL_FORMATS)
-                .build()
+            .setBarcodeFormats(Barcode.ALL_FORMATS)
+            .build()
         cameraSource = CameraSource.Builder(requireContext(), barcodeDetector)
-                .setRequestedPreviewSize(1920, 1080)
-                .setAutoFocusEnabled(true) //you should add this feature
-                .build()
+            .setRequestedPreviewSize(1920, 1080)
+            .setAutoFocusEnabled(true) //you should add this feature
+            .build()
         surfaceView!!.holder.addCallback(object : SurfaceHolder.Callback {
             override fun surfaceCreated(holder: SurfaceHolder) {
                 try {
-                    if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.checkSelfPermission(
+                            requireContext(),
+                            Manifest.permission.CAMERA
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
                         cameraSource?.start(surfaceView!!.holder)
                     } else {
-                        ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION)
+                        ActivityCompat.requestPermissions(
+                            requireActivity(),
+                            arrayOf(Manifest.permission.CAMERA),
+                            REQUEST_CAMERA_PERMISSION
+                        )
                     }
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
             }
 
-            override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {}
+            override fun surfaceChanged(
+                holder: SurfaceHolder,
+                format: Int,
+                width: Int,
+                height: Int
+            ) {
+            }
+
             override fun surfaceDestroyed(holder: SurfaceHolder) {
                 cameraSource?.stop()
             }
@@ -75,7 +95,13 @@ class QRScanner : Fragment() {
                     txtBarcodeValue!!.post {
                         txtBarcodeValue!!.removeCallbacks(null)
                         intentData = barcodes.valueAt(0)!!.rawValue
-                        intentData = String(Base64.decode(intentData.toByteArray(StandardCharsets.UTF_8), Base64.DEFAULT), StandardCharsets.UTF_8)
+                        intentData = String(
+                            Base64.decode(
+                                intentData.toByteArray(StandardCharsets.UTF_8),
+                                Base64.DEFAULT
+                            ), StandardCharsets.UTF_8
+                        )
+                        Log.d("qrdata", intentData)
                         (activity as AddFriendActivity?)?.addFriendFromQR(intentData)
                     }
                 }

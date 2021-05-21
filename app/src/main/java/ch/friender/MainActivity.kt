@@ -30,6 +30,7 @@ class MainActivity : FragmentActivity() {
         setContentView(R.layout.activity_main)
         firstLaunch = true
         //foreground permission
+        //TODO permissions
         ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission_group.LOCATION), 1234)
         ApiFetcher.initWithContext(this)
         LocationManager.initWithContext(this)
@@ -38,13 +39,13 @@ class MainActivity : FragmentActivity() {
         val navController = findNavController(R.id.nav_host_fragment)
         bottomNavigationView.setupWithNavController(navController)
 
-        val sharedPreferences = getSharedPreferences("id",MODE_PRIVATE)
+        val sharedPreferences = getSharedPreferences("id", MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         if (sharedPreferences.getString("id", "") == "") {
             ApiFetcher.registerUser { userId, error ->
-                Log.d("new id","NOK")
+                Log.d("new id", "NOK")
                 userId?.let {
-                    Log.d("new id",""+userId)
+                    Log.d("new id", "" + userId)
                     editor.putString("id", it)
                     editor.apply()
                 }

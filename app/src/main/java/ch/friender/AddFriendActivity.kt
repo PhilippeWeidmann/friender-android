@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidmads.library.qrgenearator.QRGContents
@@ -40,7 +41,10 @@ class AddFriendActivity : FragmentActivity() {
         CryptoManager.generateKeyPair(this)
         if (sharedPreferencesCrypto.getString("keyPair", "no keys") == "no keys") {
             //a surement besoin d'être refait ?
-            displayError("Error could not get key pair", "make sure you are connected to internet and reboot the app")
+            displayError(
+                "Error could not get key pair",
+                "make sure you are connected to internet and reboot the app"
+            )
             Log.e("no keys", "no keys were found")
         } else {
             keys = JSONObject(sharedPreferencesCrypto.getString("keyPair", "no keys"))
@@ -53,7 +57,10 @@ class AddFriendActivity : FragmentActivity() {
                 add<AddFriendFragment>(R.id.fragment_container_view, args = keysToFragment)
             }
         }
-        Log.i("crypto keys", " \npublic key: " + keys.get("publicKey") + "\nsecret key: " + keys.get("secretKey"))
+        Log.i(
+            "crypto keys",
+            " \npublic key: " + keys.get("publicKey") + "\nsecret key: " + keys.get("secretKey")
+        )
     }
 
     fun addFriendFromQR(qrdata: String) {
@@ -61,8 +68,12 @@ class AddFriendActivity : FragmentActivity() {
             Log.d("QRDATA", "" + qrdata)
             supportFragmentManager.popBackStack()
             if (correctQR(qrdata)) {
-                Log.d("-------------",keys.getString("secretKey"))
-                val newFriend = Friend(JSONObject(qrdata).getString("id"), JSONObject(qrdata).getString("publicKey"), keys.getString("secretKey"))
+                Log.d("-------------", keys.getString("secretKey"))
+                val newFriend = Friend(
+                    JSONObject(qrdata).getString("id"),
+                    JSONObject(qrdata).getString("publicKey"),
+                    keys.getString("secretKey")
+                )
                 FriendManager.initWithContext(this)
                 if (!FriendManager.addFriend(newFriend, this)) {
                     displayError("Already friend", "You are already friend with this person")
@@ -73,22 +84,24 @@ class AddFriendActivity : FragmentActivity() {
         }
     }
 
+
     override fun onDestroy() {
         CryptoManager.destroyKeyPair(this)
         super.onDestroy()
     }
 
     private fun correctQR(data: String): Boolean {
-        return JSONObject(data).get("id").toString().isNotEmpty() && JSONObject(data).get("publicKey").toString().isNotEmpty()
+        return JSONObject(data).get("id").toString()
+            .isNotEmpty() && JSONObject(data).get("publicKey").toString().isNotEmpty()
     }
 
     private fun displayError(title: String, message: String) {
         MaterialAlertDialogBuilder(this)
-                .setTitle(title)
-                .setMessage(message)
-                .setPositiveButton("OK") { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .show()
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
     }
 }

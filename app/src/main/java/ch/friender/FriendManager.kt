@@ -16,7 +16,8 @@ object FriendManager {
         val prefs = context.getSharedPreferences("friends", Context.MODE_PRIVATE)
         val friendArrayType = object : TypeToken<ArrayList<Friend>>() {}.type
         friends = Gson().fromJson(prefs.getString("friends", "[]"), friendArrayType)
-        userId = context.getSharedPreferences("id", Context.MODE_PRIVATE).getString("id", "").toString()
+        userId =
+            context.getSharedPreferences("id", Context.MODE_PRIVATE).getString("id", "").toString()
     }
 
     fun addFriend(friend: Friend, context: Context): Boolean {
@@ -32,18 +33,23 @@ object FriendManager {
         }
     }
 
-    fun getFriendsLocations(context: Context) {
+    fun getFriendsLocations(context: Context): ArrayList<String> {
+        val locations = ArrayList<String>()
         for (friend in friends) {
             ApiFetcher.initWithContext(context)
             ApiFetcher.getLocation(friend, userId) { location, error ->
                 location?.let {
-                    Log.d("location", " -> $location")
+                    if (location!="") {
+                        Log.d("location", " -> $location")
+                        locations.add(location)
+                    }
                 }
                 error?.let {
                     Log.e("get location error", "" + error)
                 }
             }
         }
+        return locations
     }
 
     fun sendUpdatedLocation(context: Context, location: String) {
@@ -51,7 +57,7 @@ object FriendManager {
             ApiFetcher.initWithContext(context)
             ApiFetcher.sendLocation(friend, userId, location) { res, error ->
                 res?.let {
-                    Log.d("sent location", res)
+                    Log.d("sent location", location)
                 }
                 error?.let {
                     Log.e("send location error", "" + error)
