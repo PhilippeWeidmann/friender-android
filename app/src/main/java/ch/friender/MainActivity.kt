@@ -3,11 +3,14 @@ package ch.friender
 
 import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
@@ -31,9 +34,6 @@ class MainActivity : FragmentActivity() {
         firstLaunch = true
         //foreground permission
         //TODO permissions
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission_group.LOCATION), 1234)
-        ApiFetcher.initWithContext(this)
-        LocationManager.initWithContext(this)
 
         val bottomNavigationView: BottomNavigationView = findViewById(R.id.bottom_navigation)
         val navController = findNavController(R.id.nav_host_fragment)
@@ -57,10 +57,37 @@ class MainActivity : FragmentActivity() {
         } else {
             Log.d("already an id", "" + sharedPreferences.getString("id", ""))
         }
-        intentLocation = Intent(this, LocationService::class.java)
-        startService(intentLocation)
+
+        if (checkPermission()) {
+            ApiFetcher.initWithContext(this)
+            LocationManager.initWithContext(this)
+            intentLocation = Intent(this, LocationService::class.java)
+            startService(intentLocation)
+        }
 
 
+    }
+
+    fun checkPermission(): Boolean {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_DENIED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                ),
+                123
+            )
+
+
+            return false
+        } else {
+            return true
+        }
     }
 
     override fun onResume() {

@@ -1,7 +1,6 @@
 package ch.friender.persistence
 
 import android.content.Context
-import android.util.Log
 import im.delight.android.location.SimpleLocation
 
 object LocationManager {

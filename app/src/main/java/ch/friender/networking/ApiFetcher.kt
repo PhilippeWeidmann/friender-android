@@ -42,11 +42,9 @@ object ApiFetcher {
         val request = StringRequest(Request.Method.GET, locationURL,
             { res ->
                 try {
-                    Log.d("result get", res.toString())
                     val location =
                         JSONObject(res).getJSONObject("data").getString("encryptedLocation")
                     if (location.isNotEmpty()) {
-                        Log.d("test", friend.myPrivateKey)
                         val decodedLocation = CryptoManager.decrypt(
                             location,
                             Key.fromHexString(friend.friendPublicKey),
