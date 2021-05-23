@@ -25,6 +25,7 @@ import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager
 import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import org.json.JSONObject
@@ -43,8 +44,8 @@ class Map : Fragment(), OnMapReadyCallback {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_map, container, false)
@@ -64,24 +65,28 @@ class Map : Fragment(), OnMapReadyCallback {
         this.mapboxMap = mapboxMap
 
         mapboxMap.setStyle(Style.MAPBOX_STREETS) { style ->
-            mapboxMap.getStyle(this::addMarkerImageToStyle)
+            val symbolManager = SymbolManager(mapView, mapboxMap, style)
+            addMarkerImageToStyle(style)
+            symbolManager.iconAllowOverlap = true
+            symbolManager.iconIgnorePlacement = true
+
             if ((requireActivity() as MainActivity).checkPermission()) {
                 enableLocationComponent(style)
                 if (mapboxMap.locationComponent.lastKnownLocation != null) {
                     val position = CameraPosition.Builder()
-                        .target(
-                            LatLng(
-                                mapboxMap.locationComponent.lastKnownLocation!!.latitude,
-                                mapboxMap.locationComponent.lastKnownLocation!!.longitude
+                            .target(
+                                    LatLng(
+                                            mapboxMap.locationComponent.lastKnownLocation!!.latitude,
+                                            mapboxMap.locationComponent.lastKnownLocation!!.longitude
+                                    )
                             )
-                        )
-                        .zoom(14.0)
-                        .tilt(0.0)
-                        .build()
+                            .zoom(14.0)
+                            .tilt(0.0)
+                            .build()
                     if ((activity as? MainActivity)?.firstLaunch == true) {
                         mapboxMap.animateCamera(
-                            CameraUpdateFactory.newCameraPosition(position),
-                            2000
+                                CameraUpdateFactory.newCameraPosition(position),
+                                2000
                         )
                         (activity as? MainActivity)?.firstLaunch = false
                     } else {
@@ -89,10 +94,7 @@ class Map : Fragment(), OnMapReadyCallback {
                     }
                 }
             }
-            //add marker image to style
-            addMarkerImageToStyle(style)
-            // create symbol manager object
-            val symbolOptions = ArrayList<SymbolOptions>()
+
             timer.scheduleAtFixedRate(object : TimerTask() {
                 override fun run() {
                     //your method
@@ -100,31 +102,28 @@ class Map : Fragment(), OnMapReadyCallback {
                         FriendManager.initWithContext(requireActivity())
                         val locations = FriendManager.getFriendsLocations(requireActivity())
                         val currentLatitude =
-                            ch.friender.persistence.LocationManager.currentLatitude
+                                ch.friender.persistence.LocationManager.currentLatitude
                         val currentLongitude =
-                            ch.friender.persistence.LocationManager.currentLongitude
+                                ch.friender.persistence.LocationManager.currentLongitude
                         if (currentLatitude != 0.0 && currentLongitude != 0.0) {
                             FriendManager.sendUpdatedLocation(
-                                requireActivity(),
-                                "{\"latitude\":$currentLatitude, \"longitude\":$currentLongitude}"
+                                    requireActivity(),
+                                    "{\"latitude\":$currentLatitude, \"longitude\":$currentLongitude}"
                             )
                         }
                         for (location in locations) {
-                            val latLoop = JSONObject(location).get("latitude")
-                            val longLoop = JSONObject(location).get("longitude")
-                            symbolOptions.add(
-                                SymbolOptions().withLatLng(
-                                    LatLng(
-                                        latLoop as Double,
-                                        longLoop as Double
-                                    )
-                                ).withIconImage(ICON_MARKER).withIconSize(1.0f)
-                            )
+                            val latLoop = JSONObject(location).get("latitude") as Double
+                            val longLoop = JSONObject(location).get("longitude") as Double
+                            requireActivity().runOnUiThread {
+                                val symbol = symbolManager.create(SymbolOptions()
+                                        .withLatLng(LatLng(latLoop, longLoop))
+                                        .withIconImage(ICON_MARKER)
+                                        .withIconSize(1.3f))
+                            }
                         }
-                        //TODO display markers
-                        //val symbolManager = SymbolManager(mapView, mapboxMap, style)
-                        //symbolManager.create(symbolOptions)
                     }
+
+
                 }
             }, 0, 5000)
 
@@ -144,14 +143,14 @@ class Map : Fragment(), OnMapReadyCallback {
 
     private fun addMarkerImageToStyle(style: Style) {
         style.addImage(
-            ICON_MARKER,
-            BitmapUtils.getBitmapFromDrawable(
-                ContextCompat.getDrawable(
-                    requireContext(),
-                    R.drawable.mapbox_marker_icon_20px_blue
-                )
-            )!!,
-            false
+                ICON_MARKER,
+                BitmapUtils.getBitmapFromDrawable(
+                        ContextCompat.getDrawable(
+                                requireContext(),
+                                R.drawable.mapbox_marker_icon_20px_blue
+                        )
+                )!!,
+                false
         )
     }
 
@@ -164,8 +163,8 @@ class Map : Fragment(), OnMapReadyCallback {
 
         // Activate with options
         locationComponent.activateLocationComponent(
-            LocationComponentActivationOptions.builder(requireActivity(), loadedMapStyle)
-                .build()
+                LocationComponentActivationOptions.builder(requireActivity(), loadedMapStyle)
+                        .build()
         )
 
         // Enable to make component visible
