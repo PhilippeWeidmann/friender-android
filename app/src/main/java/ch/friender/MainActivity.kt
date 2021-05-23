@@ -26,11 +26,13 @@ class MainActivity : FragmentActivity() {
 
     private lateinit var intentLocation: Intent
     var firstLaunch = false
-
+    
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        ApiFetcher.initWithContext(this)
         firstLaunch = true
         //foreground permission
         //TODO permissions
@@ -59,7 +61,6 @@ class MainActivity : FragmentActivity() {
         }
 
         if (checkPermission()) {
-            ApiFetcher.initWithContext(this)
             LocationManager.initWithContext(this)
             intentLocation = Intent(this, LocationService::class.java)
             startService(intentLocation)
@@ -70,17 +71,17 @@ class MainActivity : FragmentActivity() {
 
     fun checkPermission(): Boolean {
         if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_DENIED
+                        this,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_DENIED
         ) {
             ActivityCompat.requestPermissions(
-                this,
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                ),
-                123
+                    this,
+                    arrayOf(
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                    ),
+                    123
             )
 
 
