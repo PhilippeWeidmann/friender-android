@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.Log
 import ch.friender.cryptography.CryptoManager
 import ch.friender.networking.ApiFetcher
-import com.google.android.gms.common.api.Api
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.goterl.lazysodium.utils.Key

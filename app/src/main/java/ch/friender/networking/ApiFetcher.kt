@@ -6,16 +6,10 @@ import ch.friender.Friend
 import ch.friender.cryptography.CryptoManager
 import com.android.volley.Request
 import com.android.volley.RequestQueue
-import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.JsonRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.google.gson.JsonObject
-import com.google.gson.JsonParseException
-import com.goterl.lazysodium.LazySodiumAndroid
-import com.goterl.lazysodium.SodiumAndroid
 import com.goterl.lazysodium.utils.Key
 import org.json.JSONArray
 import org.json.JSONException

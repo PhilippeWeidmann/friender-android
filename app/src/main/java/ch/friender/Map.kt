@@ -93,7 +93,6 @@ class Map : Fragment(), OnMapReadyCallback {
             //TODO pause fetch location when app is background
             timer.scheduleAtFixedRate(object : TimerTask() {
                 override fun run() {
-                    //your method
                     if (isAdded) {
                         FriendManager.initWithContext(requireActivity())
                         FriendManager.getFriendsLocations(requireActivity()) { res ->

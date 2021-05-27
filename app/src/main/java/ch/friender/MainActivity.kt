@@ -7,26 +7,23 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
-import ch.friender.cryptography.CryptoManager
 import ch.friender.networking.ApiFetcher
 import ch.friender.persistence.LocationManager
 import ch.friender.service.LocationService
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import org.json.JSONObject
 
 
 class MainActivity : FragmentActivity() {
 
     private lateinit var intentLocation: Intent
     var firstLaunch = false
-    
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,17 +68,17 @@ class MainActivity : FragmentActivity() {
 
     fun checkPermission(): Boolean {
         if (ContextCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                ) == PackageManager.PERMISSION_DENIED
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_DENIED
         ) {
             ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(
-                            Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION,
-                    ),
-                    123
+                this,
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                ),
+                123
             )
 
 

@@ -1,32 +1,13 @@
 package ch.friender
 
-import android.content.Context
-import android.content.SharedPreferences
-import android.content.res.Resources
 import android.os.Bundle
-import android.util.Base64
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
-import androidmads.library.qrgenearator.QRGContents
-import androidmads.library.qrgenearator.QRGEncoder
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.add
 import androidx.fragment.app.commit
-import androidx.navigation.findNavController
 import ch.friender.cryptography.CryptoManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.gson.Gson
-import com.google.zxing.WriterException
-import org.json.JSONArray
 import org.json.JSONObject
-import java.nio.charset.StandardCharsets
 
 
 class AddFriendActivity : FragmentActivity() {
