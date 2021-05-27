@@ -1,16 +1,12 @@
 package ch.friender
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -30,7 +26,6 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 import com.mapbox.mapboxsdk.utils.BitmapUtils
 import org.json.JSONObject
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class Map : Fragment(), OnMapReadyCallback {
@@ -44,8 +39,8 @@ class Map : Fragment(), OnMapReadyCallback {
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_map, container, false)
@@ -74,19 +69,19 @@ class Map : Fragment(), OnMapReadyCallback {
                 enableLocationComponent(style)
                 if (mapboxMap.locationComponent.lastKnownLocation != null) {
                     val position = CameraPosition.Builder()
-                            .target(
-                                    LatLng(
-                                            mapboxMap.locationComponent.lastKnownLocation!!.latitude,
-                                            mapboxMap.locationComponent.lastKnownLocation!!.longitude
-                                    )
+                        .target(
+                            LatLng(
+                                mapboxMap.locationComponent.lastKnownLocation!!.latitude,
+                                mapboxMap.locationComponent.lastKnownLocation!!.longitude
                             )
-                            .zoom(14.0)
-                            .tilt(0.0)
-                            .build()
+                        )
+                        .zoom(14.0)
+                        .tilt(0.0)
+                        .build()
                     if ((activity as? MainActivity)?.firstLaunch == true) {
                         mapboxMap.animateCamera(
-                                CameraUpdateFactory.newCameraPosition(position),
-                                2000
+                            CameraUpdateFactory.newCameraPosition(position),
+                            2000
                         )
                         (activity as? MainActivity)?.firstLaunch = false
                     } else {
@@ -95,35 +90,41 @@ class Map : Fragment(), OnMapReadyCallback {
                 }
             }
 
+            //TODO pause fetch location when app is background
             timer.scheduleAtFixedRate(object : TimerTask() {
                 override fun run() {
                     //your method
                     if (isAdded) {
                         FriendManager.initWithContext(requireActivity())
-                        val locations = FriendManager.getFriendsLocations(requireActivity())
-                        val currentLatitude =
-                                ch.friender.persistence.LocationManager.currentLatitude
-                        val currentLongitude =
-                                ch.friender.persistence.LocationManager.currentLongitude
-                        if (currentLatitude != 0.0 && currentLongitude != 0.0) {
-                            FriendManager.sendUpdatedLocation(
-                                    requireActivity(),
-                                    "{\"latitude\":$currentLatitude, \"longitude\":$currentLongitude}"
-                            )
-                        }
-                        for (location in locations) {
-                            val latLoop = JSONObject(location).get("latitude") as Double
-                            val longLoop = JSONObject(location).get("longitude") as Double
-                            requireActivity().runOnUiThread {
-                                val symbol = symbolManager.create(SymbolOptions()
-                                        .withLatLng(LatLng(latLoop, longLoop))
-                                        .withIconImage(ICON_MARKER)
-                                        .withIconSize(1.3f))
+                        FriendManager.getFriendsLocations(requireActivity()) { res ->
+                            res?.let {
+                                for (location in it) {
+                                    val latLoop = JSONObject(location).get("latitude") as Double
+                                    val longLoop = JSONObject(location).get("longitude") as Double
+                                    Log.d("location ->", location)
+                                    requireActivity().runOnUiThread {
+                                        val symbol = symbolManager.create(
+                                            SymbolOptions()
+                                                .withLatLng(LatLng(latLoop, longLoop))
+                                                .withIconImage(ICON_MARKER)
+                                                .withIconSize(1.3f)
+                                        )
+                                    }
+                                }
                             }
                         }
+                        val currentLatitude =
+                            ch.friender.persistence.LocationManager.currentLatitude
+                        val currentLongitude =
+                            ch.friender.persistence.LocationManager.currentLongitude
+                        if (currentLatitude != 0.0 && currentLongitude != 0.0) {
+                            FriendManager.sendUpdatedLocation(
+                                requireActivity(),
+                                "{\"latitude\":$currentLatitude, \"longitude\":$currentLongitude}"
+                            )
+                        }
+
                     }
-
-
                 }
             }, 0, 5000)
 
@@ -143,14 +144,14 @@ class Map : Fragment(), OnMapReadyCallback {
 
     private fun addMarkerImageToStyle(style: Style) {
         style.addImage(
-                ICON_MARKER,
-                BitmapUtils.getBitmapFromDrawable(
-                        ContextCompat.getDrawable(
-                                requireContext(),
-                                R.drawable.mapbox_marker_icon_20px_blue
-                        )
-                )!!,
-                false
+            ICON_MARKER,
+            BitmapUtils.getBitmapFromDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.mapbox_marker_icon_20px_blue
+                )
+            )!!,
+            false
         )
     }
 
@@ -163,8 +164,8 @@ class Map : Fragment(), OnMapReadyCallback {
 
         // Activate with options
         locationComponent.activateLocationComponent(
-                LocationComponentActivationOptions.builder(requireActivity(), loadedMapStyle)
-                        .build()
+            LocationComponentActivationOptions.builder(requireActivity(), loadedMapStyle)
+                .build()
         )
 
         // Enable to make component visible

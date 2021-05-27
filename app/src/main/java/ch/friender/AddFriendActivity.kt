@@ -32,6 +32,8 @@ import java.nio.charset.StandardCharsets
 class AddFriendActivity : FragmentActivity() {
 
     private var keys = JSONObject("{\"secretKey\":\"\",\"publicKey\":\"\"}")
+    private lateinit var QRData: String
+    var alreadyScanned = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +42,6 @@ class AddFriendActivity : FragmentActivity() {
         val sharedPreferencesCrypto = getSharedPreferences("keys", FragmentActivity.MODE_PRIVATE)
         CryptoManager.generateKeyPair(this)
         if (sharedPreferencesCrypto.getString("keyPair", "no keys") == "no keys") {
-            //a surement besoin d'être refait ?
             displayError(
                 "Error could not get key pair",
                 "make sure you are connected to internet and reboot the app"
@@ -63,21 +64,39 @@ class AddFriendActivity : FragmentActivity() {
         )
     }
 
-    fun addFriendFromQR(qrdata: String) {
+    fun addFriendFromQR() {
+        Log.d("-------------", keys.getString("secretKey"))
+        val newFriend = Friend(
+            JSONObject(QRData).getString("id"),
+            JSONObject(QRData).getString("publicKey"),
+            keys.getString("secretKey")
+        )
+        FriendManager.initWithContext(this)
+        FriendManager.getHandshake(this, newFriend) { res ->
+            if (res == true) {
+                if (!FriendManager.addFriend(newFriend, this)) {
+                    displayError("Already friend", "You are already friend with this person")
+                }
+            } else {
+                displayError("Error", "You and your friend must scan your QRs mutually before adding each other")
+            }
+        }
+    }
+
+    fun sendHandshake(qrdata: String) {
         if (qrdata != "") {
             Log.d("QRDATA", "" + qrdata)
             supportFragmentManager.popBackStack()
             if (correctQR(qrdata)) {
-                Log.d("-------------", keys.getString("secretKey"))
+                QRData = qrdata
                 val newFriend = Friend(
                     JSONObject(qrdata).getString("id"),
                     JSONObject(qrdata).getString("publicKey"),
                     keys.getString("secretKey")
                 )
                 FriendManager.initWithContext(this)
-                if (!FriendManager.addFriend(newFriend, this)) {
-                    displayError("Already friend", "You are already friend with this person")
-                }
+                FriendManager.sendHandshake(newFriend, this)
+                alreadyScanned = true
             } else {
                 displayError("Wrong QR code", "The scanned QR was not a Friender QR")
             }

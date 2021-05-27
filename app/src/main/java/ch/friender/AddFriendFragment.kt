@@ -10,10 +10,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import androidmads.library.qrgenearator.QRGContents
 import androidmads.library.qrgenearator.QRGEncoder
 import androidx.core.app.ActivityCompat
@@ -61,23 +58,35 @@ class AddFriendFragment : Fragment() {
         } catch (e: WriterException) {
             Log.v("error", e.toString())
         }
+
+        if ((requireActivity() as AddFriendActivity).alreadyScanned) {
+            val imgToChange = view.findViewById<ImageView>(R.id.cameraCheck)
+            imgToChange.setImageResource(R.drawable.ic_baseline_check_circle_24)
+            val btnToChange = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.button_qr)
+            btnToChange.text = "ADD FRIEND"
+        }
+
         view.findViewById<Button>(R.id.button_qr).setOnClickListener {
-            if (ActivityCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.CAMERA
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                val nextFrag = QRScanner()
-                requireActivity().supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container_view, nextFrag)
-                    .addToBackStack(null)
-                    .commit()
+            if ((requireActivity() as AddFriendActivity).alreadyScanned) {
+                (requireActivity() as AddFriendActivity).addFriendFromQR()
             } else {
-                ActivityCompat.requestPermissions(
-                    requireActivity(),
-                    arrayOf(Manifest.permission.CAMERA),
-                    201
-                )
+                if (ActivityCompat.checkSelfPermission(
+                        requireContext(),
+                        Manifest.permission.CAMERA
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    val nextFrag = QRScanner()
+                    requireActivity().supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container_view, nextFrag)
+                        .addToBackStack(null)
+                        .commit()
+                } else {
+                    ActivityCompat.requestPermissions(
+                        requireActivity(),
+                        arrayOf(Manifest.permission.CAMERA),
+                        201
+                    )
+                }
             }
 
         }

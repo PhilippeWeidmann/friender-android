@@ -102,7 +102,7 @@ class QRScanner : Fragment() {
                             ), StandardCharsets.UTF_8
                         )
                         Log.d("qrdata", intentData)
-                        (activity as AddFriendActivity?)?.addFriendFromQR(intentData)
+                        (activity as AddFriendActivity?)?.sendHandshake(intentData)
                     }
                 }
             }

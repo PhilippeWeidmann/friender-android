@@ -60,48 +60,34 @@
         android:contentDescription="QR"
         android:maxWidth="250dp"
         android:maxHeight="250dp"
-        app:layout_constraintBottom_toTopOf="@+id/containedButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/id_textview"
         tools:src="@tools:sample/avatars" />
 
+    <ImageView
+        android:id="@+id/cameraCheck"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="32dp"
+        android:contentDescription="TODO"
+        android:maxWidth="250dp"
+        android:maxHeight="250dp"
+        android:src="@drawable/material_design_camera_icon_2"
+        app:layout_constraintEnd_toEndOf="@+id/fragment_container_view"
+        app:layout_constraintStart_toStartOf="@+id/fragment_container_view"
+        app:layout_constraintTop_toBottomOf="@+id/QR_image" />
+
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/containedButton"
+        android:id="@+id/button_qr"
         style="@style/Widget.MaterialComponents.Button.Icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Share"
-        app:icon="@drawable/ic_baseline_share_24"
-        app:iconGravity="textStart"
-        app:layout_constraintBottom_toTopOf="@+id/button_qr"
+        android:layout_marginTop="32dp"
+        android:text="Scan a QR code"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/QR_image" />
-
-    <Button
-        android:id="@+id/button_qr"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:text="From a QR code"
-        app:layout_constraintBottom_toTopOf="@+id/button_message"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/containedButton" />
-
-    <Button
-        android:id="@+id/button_message"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="From a text message"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_qr" />
+        app:layout_constraintTop_toBottomOf="@+id/cameraCheck" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
